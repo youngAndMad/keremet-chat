@@ -8,6 +8,18 @@ logging:
       security: trace
 
 spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          keremet-chat-mail-sender:
+            url: http://localhost:8080
+  liquibase:
+    database-change-log-lock-table: db_changelog_lock
+    database-change-log-table: db_changelog
+    change-log: db.changelog/db.changelog-master.yaml
+    enabled: true
+    contexts: test
   security:
     oauth2:
       client:
@@ -16,3 +28,14 @@ spring:
             provider: github
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
+  datasource:
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/keremet_chat_auth_server
+
+management:
+  endpoints:
+    web.exposure.include: health,info,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
