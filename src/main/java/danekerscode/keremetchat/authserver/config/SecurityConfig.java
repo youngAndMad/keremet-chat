@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -40,9 +39,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.util.StringUtils;
 
 import java.security.KeyPair;
@@ -66,7 +63,14 @@ public class SecurityConfig {
         add("/error");
         add("/swagger-ui/**");
         add("/v3/api-docs/**");
+        add("/.well-known/**");
     }};
+
+    //    @Bean
+    WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers("/.well-known/**");
+    }
+
 
     @Bean
     RegisteredClientRepository registeredClientRepository() {
@@ -76,8 +80,8 @@ public class SecurityConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client")
-                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
+                .postLogoutRedirectUri("http://localhost:8080/")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
@@ -124,24 +128,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(2)
+    @Order(1)
     public SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService
     ) throws Exception {
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+
+        http
+                .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+                .oidc(Customizer.withDefaults());
+
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e ->
                         e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers(
-                                        "/error",
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**"
-                                ).permitAll()
-                                .anyRequest().authenticated())
                 .oauth2Login(oauth2 ->
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                 )
@@ -149,7 +151,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
+    @Order(2)
     SecurityFilterChain bearerFilterChain(
             HttpSecurity http,
             InternalAuthFilter internalAuthFilter
