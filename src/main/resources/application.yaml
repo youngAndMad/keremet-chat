@@ -8,6 +8,17 @@ logging:
       security: trace
 
 spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cache:
+    redis:
+      time-to-live: 3600000
+  session:
+    timeout: 43200m
+
+
   cloud:
     openfeign:
       client:
@@ -17,7 +28,7 @@ spring:
   liquibase:
     database-change-log-lock-table: db_changelog_lock
     database-change-log-table: db_changelog
-    change-log: db.changelog/db.changelog-master.yaml
+    change-log: db/changelog/db.changelog-master.xml
     enabled: true
     contexts: test
   security:
@@ -26,12 +37,25 @@ spring:
         registration:
           github:
             provider: github
+            client-name: GitHub
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
+            scope:
+              - user:email
+              - read:user
+        provider:
+          github:
+            user-name-attribute: login
   datasource:
     username: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/keremet_chat_auth_server
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:8ea3d739671fc877d8810dac1fdc69bb93b60ba23b287f5d767ba46373eac681}
+    expiration: ${JWT_EXPIRATION:108000000}
+
 
 management:
   endpoints:

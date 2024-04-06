@@ -4,12 +4,11 @@ import danekerscode.keremetchat.authserver.model.entity.User;
 import danekerscode.keremetchat.authserver.repository.common.CommonRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends CommonRepository<User, Long> {
 
-    @Override
-    default Class<?> entityClass() {
-        return User.class;
-    }
+    Optional<User> findByEmail(String email);
 
 }

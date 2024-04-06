@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 
 /**
@@ -17,21 +18,16 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface CommonRepository<Entity, Pk extends Serializable> extends JpaRepository<Entity, Pk> {
 
-
     /**
      * Returns the class of the entity.
      *
      * @return the class of the entity
      */
-    Class<?> entityClass();
+    @SuppressWarnings("unchecked")
+    default Class<Entity> getEntityClass() {
+        return (Class<Entity>) ((ParameterizedType) getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
+    }
 
-    /**
-     * Finds an entity by its id and where deleted is false.
-     *
-     * @param id the id of the entity
-     * @return an Optional of the entity if found, empty Optional otherwise
-     */
-    Optional<Entity> findByIdAndDeletedFalse(Pk id);
 
     /**
      * Finds an entity by its id and throws an exception if not found or deleted is true.
@@ -41,8 +37,7 @@ public interface CommonRepository<Entity, Pk extends Serializable> extends JpaRe
      * @throws EntityNotFoundException if the entity is not found or deleted is true
      */
     default Entity findByID(Pk id) {
-        return findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException(entityClass(), id.toString()));
+        return findById(id).orElseThrow(() -> new EntityNotFoundException(getEntityClass(), id.toString()));
     }
 
 }
