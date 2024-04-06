@@ -19,4 +19,5 @@ public class Otp extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+    private LocalDateTime sentDate;
 }

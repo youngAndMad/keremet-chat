@@ -8,8 +8,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "users")
@@ -21,13 +19,11 @@ public class User extends BaseEntity {
     private Long id;
     private String email;
     private Boolean emailVerified;
+    private String username;
     @JsonIgnore
     private String password;
-    private LocalDateTime registeredTime;
     @Enumerated(EnumType.STRING)
     private AuthType authType;
-    private String providerId;
-    private String name;
     private String imageUrl;
     private String profileDescription;
     private Boolean isActive;

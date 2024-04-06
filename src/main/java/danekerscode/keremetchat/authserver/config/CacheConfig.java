@@ -10,10 +10,13 @@ import java.time.Duration;
 
 @Configuration
 public class CacheConfig {
+
+    private static final int CACHE_TTL = 60;
+
     @Bean
     public RedisCacheConfiguration redisCacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60))
+                .entryTtl(Duration.ofMinutes(CACHE_TTL))
                 .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext
@@ -21,4 +24,5 @@ public class CacheConfig {
                         .fromSerializer(new GenericJackson2JsonRedisSerializer())
                 );
     }
+
 }

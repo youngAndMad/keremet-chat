@@ -7,14 +7,12 @@ CREATE TABLE users
     last_modified_date  TIMESTAMP WITHOUT TIME ZONE,
     email               VARCHAR(255),
     email_verified      BOOLEAN,
+    username            VARCHAR(255),
     password            VARCHAR(255),
-    registered_time     TIMESTAMP WITHOUT TIME ZONE,
     auth_type           VARCHAR(255),
-    provider_id         VARCHAR(255),
-    name                VARCHAR(255),
     image_url           VARCHAR(255),
     profile_description VARCHAR(255),
     is_active           BOOLEAN,
-    role                VARCHAR
+    role                VARCHAR(255)
 );
 --rollback DROP TABLE users;
