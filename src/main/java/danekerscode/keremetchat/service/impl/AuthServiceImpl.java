@@ -2,6 +2,7 @@ package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.common.mapper.UserMapper;
 import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
+import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.response.TokenResponse;
 import danekerscode.keremetchat.model.entity.User;
@@ -11,8 +12,12 @@ import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.internal.JwtService;
 import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.service.OtpService;
+import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +29,15 @@ import java.time.LocalDateTime;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+
+    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
     private final OtpService otpService;
 
     private final JwtService jwtService;
+    private final UserService userService;
 
     @Override
     public void register(RegistrationRequest request) {
@@ -84,6 +92,21 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new AuthProcessingException("User not found", HttpStatus.NOT_FOUND)); // todo create exception
 
         otpService.sendForUser(user);
+    }
+
+    @Override
+    public TokenResponse login(LoginRequest loginRequest) {
+        var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.email(), loginRequest.password()
+        );
+        var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
+
+        var securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        var user = userService.findByEmail(loginRequest.email());
+        return this.generateToken(user);
     }
 
     private TokenResponse generateToken(User user) {

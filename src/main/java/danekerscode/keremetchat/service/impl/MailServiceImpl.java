@@ -47,9 +47,10 @@ public class MailServiceImpl implements MailService {
                 helper.setFrom(sender);
                 helper.setSubject("Keremet Chat " + messageDto.type().name());
 
+                var start = System.currentTimeMillis();
                 mailSender.send(msg);
-
-                log.info("Mail sent to {} with type {}", messageDto.to(), messageDto.type());
+                var total = System.currentTimeMillis() - start;
+                log.info("Mail sent to {} with type {} time: {}ms", messageDto.to(), messageDto.type(), total);
             } catch (Exception e) {
                 log.error("Error while Sending Mail, msg {}", e.getMessage(), e);
             }
