@@ -44,6 +44,10 @@ public class SecurityConfig {
         add("/swagger-ui/**");
         add("/v3/api-docs/**");
         add("/.well-known/**");
+        add("/api/v1/auth/register");
+        add("/api/v1/auth/login");
+        add("/api/v1/auth/confirm-email");
+        add("/api/v1/auth/resend-otp");
     }};
 
     @Bean
@@ -73,7 +77,13 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/error",
                                         "/swagger-ui/**",
-                                        "/v3/api-docs/**", "/oauth2/**").permitAll()
+                                        "/v3/api-docs/**",
+                                        "/oauth2/**",
+                                        "api/v1/auth/register",
+                                        "api/v1/auth/login",
+                                        "api/v1/auth/confirm-email",
+                                        "api/v1/auth/resend-otp"
+                                        ).permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login(oauth2 ->

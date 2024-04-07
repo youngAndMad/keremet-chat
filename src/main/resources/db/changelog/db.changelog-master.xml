@@ -4,5 +4,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
 
     <include file="db/changelog/changeset/db.changelog-1.0-create-user-table.sql"/>
-
+    <include file="db/changelog/changeset/db.changelog-1.1-create-role-table.sql"/>
+    <include file="db/changelog/changeset/db.changelog-1.2-create-otp-table.sql"/>
 </databaseChangeLog>

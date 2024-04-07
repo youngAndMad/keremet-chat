@@ -12,7 +12,6 @@ CREATE TABLE users
     auth_type           VARCHAR(255),
     image_url           VARCHAR(255),
     profile_description VARCHAR(255),
-    is_active           BOOLEAN,
-    role                VARCHAR(255)
+    is_active           BOOLEAN
 );
 --rollback DROP TABLE users;

@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Table(name = "users")
@@ -27,7 +29,12 @@ public class User extends BaseEntity {
     private String imageUrl;
     private String profileDescription;
     private Boolean isActive;
-    @Enumerated(EnumType.STRING)
-    private RoleType role;
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
+    private List<Role> roles;
 
 }

@@ -10,4 +10,6 @@ public class KeremetChatApplication {
 		SpringApplication.run(KeremetChatApplication.class, args);
 	}
 
+
+
 }

@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getIsActive(),
                 user.getIsActive(),
                 user.getIsActive(),
-                List.of(new SimpleGrantedAuthority(user.getRole().name()))
+                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).toList()
         );
     }
 }
