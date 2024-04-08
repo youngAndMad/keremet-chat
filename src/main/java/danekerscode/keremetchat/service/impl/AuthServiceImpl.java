@@ -109,6 +109,12 @@ public class AuthServiceImpl implements AuthService {
         return this.generateToken(user);
     }
 
+    @Override
+    public void logout() {
+        otpService.clearFor(SecurityContextHolder.getContext().getAuthentication().getName());
+        SecurityContextHolder.clearContext();
+    }
+
     private TokenResponse generateToken(User user) {
         return new TokenResponse(
                 jwtService.generateToken(user, TokenType.ACCESS),

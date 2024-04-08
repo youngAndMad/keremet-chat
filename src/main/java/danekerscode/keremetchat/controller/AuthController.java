@@ -8,6 +8,7 @@ import danekerscode.keremetchat.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,10 @@ public class AuthController {
 
     @PostMapping("confirm-email")
     @Operation(description = "Confirm email", responses = {
-            @ApiResponse(responseCode = "200", description = "Email confirmed. New tokens are set in cookies accessToken and refreshToken")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Email confirmed. New tokens are set in cookies accessToken and refreshToken"
+            )
     })
     void confirmEmail(
             @RequestBody @Validated EmailConfirmationRequest request,
@@ -71,11 +75,19 @@ public class AuthController {
             @RequestBody @Validated LoginRequest loginRequest,
             HttpServletResponse response
     ) {
-
         var tokenResponse = authService.login(loginRequest);
 
         CookieUtils.addCookie(response, "accessToken", tokenResponse.accessToken(), jwtExpiration);
         CookieUtils.addCookie(response, "refreshToken", tokenResponse.refreshToken(), jwtExpiration);
+    }
+
+    @PostMapping("logout")
+    @Operation(description = "Logout", responses = {
+            @ApiResponse(responseCode = "200", description = "Logout successful")
+    })
+    void logout(HttpSession session) {
+        authService.logout();
+        session.invalidate();
     }
 
 
