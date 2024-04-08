@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -53,10 +54,14 @@ public class OtpServiceImpl implements OtpService {
                 )
         );
 
+        var stopWatch = new StopWatch();
+        stopWatch.start();
         this.mailService
                 .send(emailMessage)
                 .thenRun(() -> {
-                    log.info("Successfully sent otp for {}, valid until {}", user.getEmail(), otp.getExpireDate());
+                    stopWatch.stop();
+                    log.info("Successfully sent otp for {}, valid until {}. Executed in {}ms",
+                            user.getEmail(), otp.getExpireDate(), stopWatch.getTotalTimeSeconds());
                     otp.setSentDate(LocalDateTime.now());
                     otpRepository.save(otp);
                 });

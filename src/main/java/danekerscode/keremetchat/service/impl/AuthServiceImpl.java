@@ -122,9 +122,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse resetPassword(ResetPasswordRequest request) {
-
-        return null;
+    public TokenResponse resetPassword(ResetPasswordRequest request, User user) {
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            throw new AuthProcessingException("Invalid old password", HttpStatus.BAD_REQUEST);
+        }
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        return this.generateToken(userRepository.save(user));
     }
 
     private TokenResponse generateToken(User user) {
