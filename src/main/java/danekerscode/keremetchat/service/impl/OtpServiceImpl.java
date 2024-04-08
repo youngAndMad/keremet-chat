@@ -54,14 +54,12 @@ public class OtpServiceImpl implements OtpService {
                 )
         );
 
-        var stopWatch = new StopWatch();
-        stopWatch.start();
+
         this.mailService
                 .send(emailMessage)
                 .thenRun(() -> {
-                    stopWatch.stop();
-                    log.info("Successfully sent otp for {}, valid until {}. Executed in {}ms",
-                            user.getEmail(), otp.getExpireDate(), stopWatch.getTotalTimeSeconds());
+                    log.info("Successfully sent otp for {}, valid until {}",
+                            user.getEmail(), otp.getExpireDate());
                     otp.setSentDate(LocalDateTime.now());
                     otpRepository.save(otp);
                 });

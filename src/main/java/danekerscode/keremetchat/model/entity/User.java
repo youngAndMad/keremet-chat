@@ -2,6 +2,7 @@ package danekerscode.keremetchat.model.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.model.enums.RoleType;
 import jakarta.persistence.*;
@@ -32,9 +33,9 @@ public class User extends BaseEntity {
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
             fetch = FetchType.EAGER
     )
+    @JsonManagedReference
     private List<Role> roles;
 
 }

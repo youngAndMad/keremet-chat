@@ -8,12 +8,14 @@ import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.dto.response.TokenResponse;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.model.enums.TokenType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.internal.JwtService;
 import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.service.OtpService;
+import danekerscode.keremetchat.service.RoleService;
 import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtService jwtService;
     private final UserService userService;
+    private final RoleService roleService;
 
     @Override
     public void register(RegistrationRequest request) {
@@ -88,9 +92,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         user.setEmailVerified(true);
-        this.otpService.clearFor(user.getEmail());
 
-        return this.generateToken(userRepository.save(user));
+        var savedUser = userRepository.save(user);
+        this.otpService.clearFor(savedUser.getEmail());
+
+        var role = roleService.addForUser(savedUser, RoleType.ROLE_USER);
+        savedUser.setRoles(List.of(role));
+        return this.generateToken(savedUser);
     }
 
     @Override
@@ -127,7 +135,9 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             throw new AuthProcessingException("Invalid old password", HttpStatus.BAD_REQUEST);
         }
+
         user.setPassword(passwordEncoder.encode(request.newPassword()));
+
         return this.generateToken(userRepository.save(user));
     }
 

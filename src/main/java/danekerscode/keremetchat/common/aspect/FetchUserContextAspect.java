@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class FetchUserContext {
+public class FetchUserContextAspect {
 
     private final UserRepository userRepository;
 
-    @Before("execution(* *(.., @danekerscode.keremetchat.common.annotation.FetchUserContext (*), ..)))")
+    @Before("@annotation(danekerscode.keremetchat.common.annotation.FetchUserContext)")
     public void beforeFetchUserContext() {
         var currentAuth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -55,6 +55,15 @@ public class FetchUserContext {
             return;
         }
 
+        if (currentAuthPrincipal instanceof String email) {
+            var optionalUser = userRepository.findByEmail(email);
+
+            optionalUser.ifPresent(user -> {
+                log.info("User context is set: {} for String", email);
+                UserContextHolder.setContext(user);
+            });
+            return;
+        }
         log.warn("Not supported authentication type: {}", currentAuthPrincipal.getClass().getSimpleName());
     }
 
