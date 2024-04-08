@@ -1,8 +1,11 @@
 package danekerscode.keremetchat.controller;
 
+import danekerscode.keremetchat.common.annotation.FetchUserContext;
+import danekerscode.keremetchat.context.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
+import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,12 +23,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("api/v1/auth")
 public class AuthController {
 
-    private final AuthService authService;
+    private static final String ACCESS_TOKEN = "accessToken";
+    private static final String REFRESH_TOKEN = "refreshToken";
     @Value("${app.jwt.expiration}")
     private Integer jwtExpiration;
+    private final AuthService authService;
 
 
     @PostMapping("register")
@@ -33,7 +39,7 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User registered")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    void register(@RequestBody @Validated RegistrationRequest request) {
+    void register(@RequestBody RegistrationRequest request) {
         authService.register(request);
     }
 
@@ -50,13 +56,13 @@ public class AuthController {
             )
     })
     void confirmEmail(
-            @RequestBody @Validated EmailConfirmationRequest request,
+            @RequestBody EmailConfirmationRequest request,
             HttpServletResponse response
     ) {
         var tokenResponse = authService.confirmEmail(request);
 
-        CookieUtils.addCookie(response, "accessToken", tokenResponse.accessToken(), jwtExpiration);
-        CookieUtils.addCookie(response, "refreshToken", tokenResponse.refreshToken(), jwtExpiration);
+        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
     }
 
     @Operation(description = "Resend otp", responses = {
@@ -72,13 +78,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Login successful")
     })
     void login(
-            @RequestBody @Validated LoginRequest loginRequest,
+            @RequestBody LoginRequest loginRequest,
             HttpServletResponse response
     ) {
         var tokenResponse = authService.login(loginRequest);
 
-        CookieUtils.addCookie(response, "accessToken", tokenResponse.accessToken(), jwtExpiration);
-        CookieUtils.addCookie(response, "refreshToken", tokenResponse.refreshToken(), jwtExpiration);
+        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
     }
 
     @PostMapping("logout")
@@ -90,5 +96,18 @@ public class AuthController {
         session.invalidate();
     }
 
+    @PatchMapping("reset-password")
+    @FetchUserContext
+    @Operation(description = "Reset password", responses = {
+            @ApiResponse(responseCode = "200", description = "Password reset")
+    })
+    void resetPassword(
+            @RequestBody ResetPasswordRequest request,
+            HttpServletResponse response
+    ) {
+        var tokenResponse = authService.resetPassword(request, UserContextHolder.getContext());
 
+        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
+    }
 }

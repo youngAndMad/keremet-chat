@@ -4,6 +4,7 @@ import danekerscode.keremetchat.common.mapper.UserMapper;
 import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
+import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.dto.response.TokenResponse;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.TokenType;
@@ -41,12 +42,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegistrationRequest request) {
-        var userIsExist = userRepository.existsByEmail(request.email());
+        var userIsExistByEmail = userRepository.existsByEmail(request.email());
 
-        if (userIsExist) {
+        if (userIsExistByEmail) {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
         }
 
+        var userIsExistByUsername = userRepository.existsByUsername(request.username());
+
+        if (userIsExistByUsername) {
+            throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
+        }
         var mappedUser = userMapper.registrationRequestToUser(request, passwordEncoder.encode(request.password()));
 
         var user = userRepository.save(mappedUser);
@@ -113,6 +119,12 @@ public class AuthServiceImpl implements AuthService {
     public void logout() {
         otpService.clearFor(SecurityContextHolder.getContext().getAuthentication().getName());
         SecurityContextHolder.clearContext();
+    }
+
+    @Override
+    public TokenResponse resetPassword(ResetPasswordRequest request) {
+
+        return null;
     }
 
     private TokenResponse generateToken(User user) {
