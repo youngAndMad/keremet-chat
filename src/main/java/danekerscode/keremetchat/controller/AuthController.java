@@ -11,6 +11,7 @@ import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.Email;
@@ -20,14 +21,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static danekerscode.keremetchat.common.AppConstants.*;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("api/v1/auth")
 public class AuthController {
 
-    private static final String ACCESS_TOKEN = "accessToken";
-    private static final String REFRESH_TOKEN = "refreshToken";
     @Value("${app.jwt.expiration}")
     private Integer jwtExpiration;
     private final AuthService authService;
@@ -95,9 +96,11 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Logout successful")
     })
     @FetchUserContext
-    void logout(HttpSession session) {
+    void logout(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
         authService.logout();
         session.invalidate();
+
+        CookieUtils.deleteCookie(request, response, ACCESS_TOKEN);
     }
 
     @PatchMapping("reset-password")
