@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.common.mapper.UserMapper;
+import danekerscode.keremetchat.context.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
@@ -117,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout() {
-        otpService.clearFor(SecurityContextHolder.getContext().getAuthentication().getName());
+        otpService.clearFor(UserContextHolder.getContext().getEmail());
         SecurityContextHolder.clearContext();
     }
 

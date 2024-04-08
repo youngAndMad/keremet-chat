@@ -6,6 +6,7 @@ import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
+import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.utils.CookieUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,8 +45,12 @@ public class AuthController {
     }
 
     @GetMapping("me")
-    Authentication me() {
-        return SecurityContextHolder.getContext().getAuthentication();
+    @FetchUserContext
+    @Operation(description = "Get current user", responses = {
+            @ApiResponse(responseCode = "200", description = "Current user")
+    })
+    User me() {
+        return UserContextHolder.getContext();
     }
 
     @PostMapping("confirm-email")
@@ -91,6 +96,7 @@ public class AuthController {
     @Operation(description = "Logout", responses = {
             @ApiResponse(responseCode = "200", description = "Logout successful")
     })
+    @FetchUserContext
     void logout(HttpSession session) {
         authService.logout();
         session.invalidate();
