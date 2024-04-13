@@ -11,6 +11,7 @@ import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.model.enums.TokenType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
+import danekerscode.keremetchat.model.exception.OtpException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.internal.JwtService;
 import danekerscode.keremetchat.service.AuthService;
@@ -78,17 +79,17 @@ public class AuthServiceImpl implements AuthService {
         var otpList = otpService.getOtpForUserEmail(request.email());
 
         if (otpList.isEmpty()) {
-            throw new AuthProcessingException("Otp not found", HttpStatus.NOT_FOUND); // todo create exception
+            throw new OtpException(OtpException.OtpExceptionType.OTP_NOT_FOUND);
         }
 
         var otp = otpList.get(0);
 
         if (!otp.getOtp().equals(request.otp())) {
-            throw new AuthProcessingException("Invalid otp", HttpStatus.BAD_REQUEST);
+            throw new OtpException(OtpException.OtpExceptionType.OTP_INVALID);
         }
 
         if (otp.getExpireDate().isBefore(LocalDateTime.now())) {
-            throw new AuthProcessingException("Otp expired", HttpStatus.BAD_REQUEST);
+            throw new OtpException(OtpException.OtpExceptionType.OTP_EXPIRED);
         }
 
         user.setEmailVerified(true);
@@ -98,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
 
         var role = roleService.addForUser(savedUser, RoleType.ROLE_USER);
         savedUser.setRoles(List.of(role));
+
         return this.generateToken(savedUser);
     }
 

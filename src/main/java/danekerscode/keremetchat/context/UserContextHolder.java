@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class UserContextHolder {
 
-    private final ThreadLocal<User> userContext = new ThreadLocal<>();
+    private final static ThreadLocal<User> userContext = new ThreadLocal<>();
 
     public static void setContext(User context) {
         userContext.set(context);

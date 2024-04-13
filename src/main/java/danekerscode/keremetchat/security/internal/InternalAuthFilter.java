@@ -48,7 +48,8 @@ public class InternalAuthFilter extends OncePerRequestFilter {
         var authentication = new UsernamePasswordAuthenticationToken(
                 principal,
                 null,
-                List.of(new SimpleGrantedAuthority(jwtService.getRoleFromJwt(jwt))));
+                List.of(new SimpleGrantedAuthority(jwtService.getRoleFromJwt(jwt)))
+        );
 
         var context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);

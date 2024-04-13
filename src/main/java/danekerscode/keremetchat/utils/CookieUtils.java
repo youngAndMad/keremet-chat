@@ -12,7 +12,7 @@ import java.util.Optional;
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
-        return Arrays.stream(request.getCookies())
+        return Arrays.stream(request.getCookies() == null ? new Cookie[0] : request.getCookies())
                 .filter(cookie -> cookie.getName().equals(name))
                 .findAny();
     }

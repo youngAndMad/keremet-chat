@@ -85,18 +85,20 @@ public class SecurityConfig {
                                         "api/v1/auth/resend-otp"
                                         ).permitAll()
                                 .anyRequest().authenticated())
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
                 .oauth2Login(oauth2 ->
                         oauth2.userInfoEndpoint(userInfo ->
                                         userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(successHandler
-                                )
+                                .successHandler(successHandler)
                                 .authorizationEndpoint(authEndpoint ->
-                                        authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
-                                )
+                                        authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                 );
 
         return http.build();
+    }
+
+    private static HttpStatusEntryPoint getAuthenticationEntryPoint() {
+        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
     }
 
     @Bean
@@ -115,7 +117,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
                 .addFilterBefore(internalAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth ->
                         auth

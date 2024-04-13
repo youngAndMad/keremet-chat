@@ -4,12 +4,16 @@ import danekerscode.keremetchat.context.UserContextHolder;
 import danekerscode.keremetchat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
+
+;
 
 @Aspect
 @Component
@@ -64,7 +68,23 @@ public class FetchUserContextAspect {
             });
             return;
         }
+
+        if (currentAuthPrincipal instanceof DefaultOAuth2User defaultOAuth2User) {
+            var username = defaultOAuth2User.getAttribute("email");
+            var optionalUser = userRepository.findByUsername(defaultOAuth2User.getName());
+
+            optionalUser.ifPresent(user -> {
+                log.info("User context is set: {} for DefaultOAuth2User", username);
+                UserContextHolder.setContext(user);
+            });
+            return;
+        }
         log.warn("Not supported authentication type: {}", currentAuthPrincipal.getClass().getSimpleName());
+    }
+
+    @After("@annotation(danekerscode.keremetchat.common.annotation.FetchUserContext)")
+    public void afterFetchUserContext() {
+        UserContextHolder.clear();
     }
 
 }
