@@ -63,10 +63,10 @@ public class AuthController {
             @RequestBody EmailConfirmationRequest request,
             HttpServletResponse response
     ) {
-        var tokenResponse = authService.confirmEmail(request);
+        var authResponse = authService.confirmEmail(request);
 
-        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
-        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
+        CookieUtils.addCookie(response, ACCESS_TOKEN, authResponse.token().accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, authResponse.token().refreshToken(), jwtExpiration);
     }
 
     @Operation(description = "Resend otp", responses = {
@@ -81,14 +81,16 @@ public class AuthController {
     @Operation(description = "Login", responses = {
             @ApiResponse(responseCode = "200", description = "Login successful")
     })
-    void login(
+    User login(
             @RequestBody LoginRequest loginRequest,
             HttpServletResponse response
     ) {
-        var tokenResponse = authService.login(loginRequest);
+        var authResponse = authService.login(loginRequest);
 
-        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
-        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
+        CookieUtils.addCookie(response, ACCESS_TOKEN, authResponse.token().accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, authResponse.token().refreshToken(), jwtExpiration);
+
+        return authResponse.user();
     }
 
     @PostMapping("logout")
@@ -101,6 +103,7 @@ public class AuthController {
         session.invalidate();
 
         CookieUtils.deleteCookie(request, response, ACCESS_TOKEN);
+        CookieUtils.deleteCookie(request, response, REFRESH_TOKEN);
     }
 
     @PatchMapping("reset-password")
@@ -108,13 +111,15 @@ public class AuthController {
     @Operation(description = "Reset password", responses = {
             @ApiResponse(responseCode = "200", description = "Password reset")
     })
-    void resetPassword(
+    User resetPassword(
             @RequestBody ResetPasswordRequest request,
             HttpServletResponse response
     ) {
-        var tokenResponse = authService.resetPassword(request, UserContextHolder.getContext());
+        var authResponse = authService.resetPassword(request, UserContextHolder.getContext());
 
-        CookieUtils.addCookie(response, ACCESS_TOKEN, tokenResponse.accessToken(), jwtExpiration);
-        CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken(), jwtExpiration);
+        CookieUtils.addCookie(response, ACCESS_TOKEN, authResponse.token().accessToken(), jwtExpiration);
+        CookieUtils.addCookie(response, REFRESH_TOKEN, authResponse.token().refreshToken(), jwtExpiration);
+
+        return authResponse.user();
     }
 }

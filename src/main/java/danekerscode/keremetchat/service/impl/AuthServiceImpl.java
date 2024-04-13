@@ -6,6 +6,7 @@ import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
+import danekerscode.keremetchat.model.dto.response.AuthenticationResponse;
 import danekerscode.keremetchat.model.dto.response.TokenResponse;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.RoleType;
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public TokenResponse confirmEmail(EmailConfirmationRequest request) {
+    public AuthenticationResponse confirmEmail(EmailConfirmationRequest request) {
         var user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new AuthProcessingException("User not found", HttpStatus.NOT_FOUND));
 
@@ -100,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
         var role = roleService.addForUser(savedUser, RoleType.ROLE_USER);
         savedUser.setRoles(List.of(role));
 
-        return this.generateToken(savedUser);
+        return new AuthenticationResponse(savedUser, this.generateToken(savedUser));
     }
 
     @Override
@@ -112,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse login(LoginRequest loginRequest) {
+    public AuthenticationResponse login(LoginRequest loginRequest) {
         var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.email(), loginRequest.password()
         );
@@ -123,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.setContext(securityContext);
 
         var user = userService.findByEmail(loginRequest.email());
-        return this.generateToken(user);
+        return new AuthenticationResponse(user, this.generateToken(user));
     }
 
     @Override
@@ -133,14 +134,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse resetPassword(ResetPasswordRequest request, User user) {
+    public AuthenticationResponse resetPassword(ResetPasswordRequest request, User user) {
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             throw new AuthProcessingException("Invalid old password", HttpStatus.BAD_REQUEST);
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
 
-        return this.generateToken(userRepository.save(user));
+        var savedUser = userRepository.save(user);
+        return new AuthenticationResponse(savedUser, this.generateToken(savedUser));
     }
 
     private TokenResponse generateToken(User user) {
