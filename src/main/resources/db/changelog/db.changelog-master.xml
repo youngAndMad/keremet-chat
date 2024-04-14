@@ -1,9 +1,12 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
+>
 
     <include file="db/changelog/changeset/db.changelog-1.0-create-user-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.1-create-role-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.2-create-otp-table.sql"/>
+    <include file="db/changelog/changeset/db.changelog-1.3-create-table-chat-and-chat-member.sql"/>
 </databaseChangeLog>

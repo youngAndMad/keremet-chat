@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.model.entity.Role;
-import danekerscode.keremetchat.model.entity.RoleRepository;
+import danekerscode.keremetchat.repository.RoleRepository;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.service.RoleService;
