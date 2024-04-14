@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.security.internal;
 
 import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.model.enums.TokenType;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -11,12 +10,11 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import static danekerscode.keremetchat.common.AppConstants.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class JwtService {
-    private static final String ROLE_CLAIM = "role";
-    private static final String TOKEN_TYPE_CLAIM = "tokenType";
 
     @Value("${app.jwt.secret}")
     private String jwtSecret;

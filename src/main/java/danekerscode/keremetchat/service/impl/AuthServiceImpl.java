@@ -2,6 +2,7 @@ package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.common.mapper.UserMapper;
 import danekerscode.keremetchat.context.UserContextHolder;
+import danekerscode.keremetchat.model.dto.EmailMessageDto;
 import danekerscode.keremetchat.model.dto.request.EmailConfirmationRequest;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
@@ -15,11 +16,9 @@ import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.model.exception.OtpException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.internal.JwtService;
-import danekerscode.keremetchat.service.AuthService;
-import danekerscode.keremetchat.service.OtpService;
-import danekerscode.keremetchat.service.RoleService;
-import danekerscode.keremetchat.service.UserService;
+import danekerscode.keremetchat.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -46,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserService userService;
     private final RoleService roleService;
+    private final MailService mailService;
 
     @Override
     public void register(RegistrationRequest request) {
@@ -100,6 +101,13 @@ public class AuthServiceImpl implements AuthService {
 
         var role = roleService.addForUser(savedUser, RoleType.ROLE_USER);
         savedUser.setRoles(List.of(role));
+
+        mailService.send(new EmailMessageDto(
+                savedUser.getEmail(),
+                EmailMessageDto.EmailMessageType.REGISTRATION_GREETING
+        )).thenRun(() -> {
+            log.info("Sent greeting for {}", savedUser.getEmail());
+        });
 
         return new AuthenticationResponse(savedUser, this.generateToken(savedUser));
     }

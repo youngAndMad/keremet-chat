@@ -21,7 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import static danekerscode.keremetchat.common.AppConstants.*;
+import static danekerscode.keremetchat.common.AppConstants.ACCESS_TOKEN;
+import static danekerscode.keremetchat.common.AppConstants.REFRESH_TOKEN;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class AuthController {
                     description = "Email confirmed. New tokens are set in cookies accessToken and refreshToken"
             )
     })
-    void confirmEmail(
+    User confirmEmail(
             @RequestBody EmailConfirmationRequest request,
             HttpServletResponse response
     ) {
@@ -67,6 +68,8 @@ public class AuthController {
 
         CookieUtils.addCookie(response, ACCESS_TOKEN, authResponse.token().accessToken(), jwtExpiration);
         CookieUtils.addCookie(response, REFRESH_TOKEN, authResponse.token().refreshToken(), jwtExpiration);
+
+        return authResponse.user();
     }
 
     @Operation(description = "Resend otp", responses = {
