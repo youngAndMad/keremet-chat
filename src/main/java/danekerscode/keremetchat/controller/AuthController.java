@@ -101,7 +101,11 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Logout successful")
     })
     @FetchUserContext
-    void logout(HttpSession session, HttpServletResponse response, HttpServletRequest request) {
+    void logout(
+            HttpSession session,
+            HttpServletResponse response,
+            HttpServletRequest request
+    ) {
         authService.logout();
         session.invalidate();
 

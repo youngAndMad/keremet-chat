@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.config;
 
+import danekerscode.keremetchat.security.CustomLogoutSuccessHandler;
 import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.internal.InternalAuthFilter;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
@@ -67,6 +68,7 @@ public class SecurityConfig {
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler successHandler,
+            CustomLogoutSuccessHandler logoutSuccessHandler,
             HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository
     ) throws Exception {
         http
@@ -87,12 +89,11 @@ public class SecurityConfig {
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
                 .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(userInfo ->
-                                        userInfo.oidcUserService(customOidcUserService))
+                        oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler)
-                                .authorizationEndpoint(authEndpoint ->
-                                        authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                                .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                 );
+//                .logout(logout -> logout.logoutSuccessHandler(logoutSuccessHandler).logoutUrl("/api/v1/auth/logout"));
 
         return http.build();
     }
