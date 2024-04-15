@@ -1,8 +1,6 @@
 package danekerscode.keremetchat.config;
 
-import danekerscode.keremetchat.security.CustomLogoutSuccessHandler;
 import danekerscode.keremetchat.security.CustomUserDetailsService;
-import danekerscode.keremetchat.security.internal.InternalAuthFilter;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +63,6 @@ public class SecurityConfig {
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler successHandler,
-            CustomLogoutSuccessHandler logoutSuccessHandler,
             HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository
     ) throws Exception {
         http
@@ -92,8 +86,7 @@ public class SecurityConfig {
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler)
                                 .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
-                );
-//                .logout(logout -> logout.logoutSuccessHandler(logoutSuccessHandler).logoutUrl("/api/v1/auth/logout"));
+                ).logout(logoutSettings -> logoutSettings.logoutUrl("/api/v1/auth/logout").permitAll());
 
         return http.build();
     }
@@ -104,22 +97,15 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    SecurityFilterChain bearerFilterChain(
-            HttpSecurity http,
-            InternalAuthFilter internalAuthFilter
+    SecurityFilterChain sessionFilterChain(
+            HttpSecurity http
     ) throws Exception {
 
-        RequestMatcher bearerRequestMatcher = request -> publicEndpoints.contains(request.getServletPath()) ||
-                (StringUtils.hasText(request.getHeader("Authorization")) &&
-                        request.getHeader("Authorization").startsWith("Internal "));
-
         return http
-                .securityMatcher(bearerRequestMatcher)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
-                .addFilterBefore(internalAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
