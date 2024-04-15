@@ -86,7 +86,19 @@ public class SecurityConfig {
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler)
                                 .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
-                ).logout(logoutSettings -> logoutSettings.logoutUrl("/api/v1/auth/logout").permitAll());
+                )
+
+                /*
+                 * If you request POST /logout, then it will perform the following default operations using a series of LogoutHandlers:
+                 * Invalidate the HTTP session (SecurityContextLogoutHandler)
+                 * Clear the SecurityContextHolderStrategy (SecurityContextLogoutHandler)
+                 * Clear the SecurityContextRepository (SecurityContextLogoutHandler)
+                 * Clean up any RememberMe authentication (TokenRememberMeServices / PersistentTokenRememberMeServices)
+                 * Clear out any saved CSRF token (CsrfLogoutHandler)
+                 * Fire a LogoutSuccessEvent (LogoutSuccessEventPublishingLogoutHandler)
+                 * Once completed, then it will exercise its default LogoutSuccessHandler which redirects to /login?logout.
+                 */
+                .logout(logoutSettings -> logoutSettings.logoutUrl("/api/v1/auth/logout").permitAll());
 
         return http.build();
     }

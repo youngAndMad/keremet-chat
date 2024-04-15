@@ -1,10 +1,10 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.common.mapper.UserMapper;
-import danekerscode.keremetchat.context.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthService;
@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
 
     @Override
-    public void register(RegistrationRequest request) {
+    public User register(RegistrationRequest request) {
         var userIsExistByEmail = userRepository.existsByEmail(request.email());
 
         if (userIsExistByEmail) {
@@ -51,26 +51,29 @@ public class AuthServiceImpl implements AuthService {
 
         var user = userRepository.save(mappedUser);
 
+        roleService.addForUser(user, RoleType.ROLE_USER);
+
+        setAuthContext(user.getEmail(), user.getPassword());
+        return user;
     }
 
-//        var token = UsernamePasswordAuthenticationToken.unauthenticated(user.getEmail(), user.getPassword());
-//        var authentication = authenticationManager.authenticate(token);
-//        var context = SecurityContextHolder.createEmptyContext();
-//        context.setAuthentication(authentication);
-//        SecurityContextHolder.setContext(context);
 
     @Override
     public User login(LoginRequest loginRequest) {
+        setAuthContext(loginRequest.email(), loginRequest.password());
+        return userService.findByEmail(loginRequest.email());
+    }
+
+    private void setAuthContext(String email, String password) {
         var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                loginRequest.email(), loginRequest.password()
+                email, password
         );
+
         var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
 
         var securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
-
-        return userService.findByEmail(loginRequest.email());
     }
 
 }

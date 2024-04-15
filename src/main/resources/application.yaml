@@ -69,12 +69,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/keremet_chat
 
 app:
-  jwt:
-    secret: ${JWT_SECRET:8ea3d739671fc877d8810dac1fdc69bb93b60ba23b287f5d767ba46373eac681}
-    expiration: ${JWT_EXPIRATION:108000000}
-  otp:
-    expiration: ${OTP_EXPIRATION:5m} # 5 minutes
-
+  ws:
+    allowed-origins: http://localhost:5173
 
 cors:
   allowCredentials: true

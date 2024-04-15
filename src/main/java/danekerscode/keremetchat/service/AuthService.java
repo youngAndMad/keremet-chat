@@ -6,7 +6,7 @@ import danekerscode.keremetchat.model.entity.User;
 
 public interface AuthService {
 
-    void register(RegistrationRequest request);
+    User register(RegistrationRequest request);
 
     User login(LoginRequest loginRequest);
 }
