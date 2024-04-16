@@ -27,21 +27,6 @@ spring:
       time-to-live: 3600000
   session:
     timeout: 43200m
-
-
-  mail:
-    sender:
-      address: todo@gmail.com
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   liquibase:
     database-change-log-lock-table: db_changelog_lock
     database-change-log-table: db_changelog
@@ -66,7 +51,7 @@ spring:
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/keremet_chat
+    url: jdbc:postgresql://localhost:5433/keremet_chat
 
 app:
   ws:

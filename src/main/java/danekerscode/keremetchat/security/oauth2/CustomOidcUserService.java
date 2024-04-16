@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.security.oauth2;
 
 import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -50,30 +49,11 @@ public class CustomOidcUserService extends OidcUserService {
 //                .get();
 //        user.setRole(role);
 
-        user.setIsActive(true);
 
         userRepository.save(user);
     }
 
     private Set<GrantedAuthority> mapAuthorities(OidcUser oidcUser) {
-        Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
-        oidcUser.getAuthorities().forEach((authority) -> {
-            GrantedAuthority mappedAuthority;
-
-            if (authority instanceof OidcUserAuthority userAuthority) {
-                mappedAuthority = new OidcUserAuthority(
-                        RoleType.ROLE_USER.name(), userAuthority.getIdToken(), userAuthority.getUserInfo());
-            } else if (authority instanceof OAuth2UserAuthority userAuthority) {
-                mappedAuthority = new OAuth2UserAuthority(
-                        RoleType.ROLE_USER.name(), userAuthority.getAttributes());
-            } else {
-                mappedAuthority = authority;
-            }
-
-            mappedAuthorities.add(mappedAuthority);
-        });
-
-        return mappedAuthorities;
+        return new HashSet<>(); //todo
     }
 }

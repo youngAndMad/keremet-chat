@@ -4,11 +4,9 @@ import danekerscode.keremetchat.common.mapper.UserMapper;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.model.enums.RoleType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthService;
-import danekerscode.keremetchat.service.RoleService;
 import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
 
     private final UserService userService;
-    private final RoleService roleService;
 
     @Override
     public User register(RegistrationRequest request) {
@@ -50,8 +47,6 @@ public class AuthServiceImpl implements AuthService {
         var mappedUser = userMapper.registrationRequestToUser(request, passwordEncoder.encode(request.password()));
 
         var user = userRepository.save(mappedUser);
-
-        roleService.addForUser(user, RoleType.ROLE_USER);
 
         setAuthContext(user.getEmail(), user.getPassword());
         return user;
