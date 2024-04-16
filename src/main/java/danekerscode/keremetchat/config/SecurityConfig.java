@@ -96,6 +96,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Order(1)
     SecurityFilterChain sessionFilterChain(HttpSecurity http)
             throws Exception {
 
