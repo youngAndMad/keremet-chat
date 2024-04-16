@@ -24,7 +24,7 @@ public interface CommonRepository<Entity, Pk extends Serializable> extends JpaRe
      */
     @SuppressWarnings("unchecked")
     default Class<Entity> getEntityClass() {
-        return (Class<Entity>) ((ParameterizedType) getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
+        return (Class) ((ParameterizedType) getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
     }
 
 
