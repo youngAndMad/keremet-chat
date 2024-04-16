@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
 
     @Override
-    public User register(RegistrationRequest request) {
+    public void register(RegistrationRequest request) {
         var userIsExistByEmail = userRepository.existsByEmail(request.email());
 
         if (userIsExistByEmail) {
@@ -45,23 +45,14 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
         }
         var mappedUser = userMapper.registrationRequestToUser(request, passwordEncoder.encode(request.password()));
-
-        var user = userRepository.save(mappedUser);
-
-        setAuthContext(user.getEmail(), user.getPassword());
-        return user;
+        userRepository.save(mappedUser);
     }
 
 
     @Override
     public User login(LoginRequest loginRequest) {
-        setAuthContext(loginRequest.email(), loginRequest.password());
-        return userService.findByEmail(loginRequest.email());
-    }
-
-    private void setAuthContext(String email, String password) {
         var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                email, password
+                loginRequest.email(),loginRequest.password()
         );
 
         var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
@@ -69,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
         var securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
+        return userService.findByEmail(loginRequest.email());
     }
 
 }

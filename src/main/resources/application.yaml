@@ -6,6 +6,7 @@ logging:
     org.springframework:
       web: DEBUG
       security: trace
+      session: debug
 
 spring:
   jpa:

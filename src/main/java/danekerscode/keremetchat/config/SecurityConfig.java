@@ -39,11 +39,8 @@ public class SecurityConfig {
         add("/error");
         add("/swagger-ui/**");
         add("/v3/api-docs/**");
-        add("/.well-known/**");
         add("/api/v1/auth/register");
         add("/api/v1/auth/login");
-        add("/api/v1/auth/confirm-email");
-        add("/api/v1/auth/resend-otp");
     }};
 
     @Bean
@@ -73,13 +70,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/error",
                                         "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/oauth2/**",
-                                        "api/v1/auth/register",
-                                        "api/v1/auth/login",
-                                        "api/v1/auth/confirm-email",
-                                        "api/v1/auth/resend-otp"
-                                        ).permitAll()
+                                        "/v3/api-docs/**"
+                                ).permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
                 .oauth2Login(oauth2 ->
@@ -103,27 +95,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private static HttpStatusEntryPoint getAuthenticationEntryPoint() {
-        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
-    }
-
     @Bean
-    @Order(1)
-    SecurityFilterChain sessionFilterChain(
-            HttpSecurity http
-    ) throws Exception {
+    SecurityFilterChain sessionFilterChain(HttpSecurity http)
+            throws Exception {
 
-        return http
+        http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
-                                .anyRequest().authenticated()
-                )
-                .build();
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
+                        .anyRequest().authenticated());
+
+        return http.build();
+    }
+
+    private static HttpStatusEntryPoint getAuthenticationEntryPoint() {
+        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
     }
 
     @Bean
@@ -140,3 +129,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y);
     }
 }
+

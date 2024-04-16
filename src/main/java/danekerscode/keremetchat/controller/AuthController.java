@@ -26,8 +26,10 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User registered")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    void register(@RequestBody RegistrationRequest request) {
+    User register(@RequestBody RegistrationRequest request) {
         authService.register(request);
+
+        return authService.login(new LoginRequest(request.email(), request.password()));
     }
 
     @GetMapping("me")

@@ -35,8 +35,8 @@ public class UserContextHelper {
         }
 
         if (currentAuthPrincipal instanceof DefaultOAuth2User defaultOAuth2User) {
-            var username = defaultOAuth2User.getAttribute("email");
-            return userRepository.findByUsername((String) username).orElseThrow(() -> new RuntimeException("User not found"));
+            var username = defaultOAuth2User.getName();
+            return userRepository.findByUsername( username).orElseThrow(() -> new RuntimeException("User not found"));
         }
 
         throw new RuntimeException("Not supported authentication type for user extraction %s".formatted(currentAuthPrincipal.getClass().getName()));

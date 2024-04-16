@@ -35,6 +35,7 @@ public class ChatController {
     @Operation(description = "Delete a private chat", responses = {
             @ApiResponse(responseCode = "204", description = "Chat deleted")
     })
+    @FetchUserContext
     void deletePrivateChat(
             @PathVariable Long chatId
     ) {
