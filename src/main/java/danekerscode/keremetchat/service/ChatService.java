@@ -7,4 +7,5 @@ public interface ChatService {
 
     IdDto<Long> createChat(CreatePrivateChatRequest createChatRequest);
 
+    void deletePrivateChat(Long chatId);
 }

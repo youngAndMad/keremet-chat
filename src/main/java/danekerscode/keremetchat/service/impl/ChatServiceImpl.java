@@ -4,9 +4,10 @@ import danekerscode.keremetchat.context.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
 import danekerscode.keremetchat.model.entity.Chat;
-import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.ChatType;
 import danekerscode.keremetchat.model.enums.ChatUserRole;
+import danekerscode.keremetchat.model.exception.EntityNotFoundException;
+import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
 import danekerscode.keremetchat.repository.ChatRepository;
 import danekerscode.keremetchat.service.ChatMemberService;
 import danekerscode.keremetchat.service.ChatService;
@@ -41,5 +42,26 @@ public class ChatServiceImpl implements ChatService {
         chatRepository.save(chat);
 
         return new IdDto<>(chat.getId());
+    }
+
+    @Override
+    public void deletePrivateChat(Long chatId) {
+        var currentUser = UserContextHolder.getContext();
+
+        if (!chatRepository.isExistByID(chatId)) {
+            throw new EntityNotFoundException(Chat.class, chatId);
+        }
+
+        var chat = chatRepository.findByID(chatId);
+
+        if(chat.getType() != ChatType.PRIVATE){
+            throw new InvalidRequestPayloadException("Chat is not private");
+        }
+
+        if(chat.getMembers().stream().noneMatch(chatMember -> chatMember.getUser().getId().equals(currentUser.getId()))){
+            throw new InvalidRequestPayloadException("User is not a member of the chat");
+        }
+
+        chatRepository.deleteById(chatId);
     }
 }

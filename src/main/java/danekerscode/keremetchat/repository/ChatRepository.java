@@ -12,8 +12,5 @@ public interface ChatRepository extends CommonRepository<Chat, Long> {
         return Chat.class;
     }
 
-//    @Query(nativeQuery = true,
-//            """
-//""")
-//    boolean isPrivateChatExistsFor(String ownerEmail, String memberEmail);
+
 }

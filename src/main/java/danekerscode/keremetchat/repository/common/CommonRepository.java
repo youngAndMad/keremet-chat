@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.repository.common;
 
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -25,6 +26,18 @@ public interface CommonRepository<Entity, Pk extends Serializable> extends JpaRe
     @SuppressWarnings("unchecked")
     default Class<Entity> getEntityClass() {
         return (Class) ((ParameterizedType) getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0];
+    }
+
+    boolean existsById(@NonNull Pk id);
+
+    /**
+     * Checks if an entity exists by its id.
+     *
+     * @param id the id of the entity
+     * @return true if the entity exists, false otherwise
+     */
+    default boolean isExistByID(@NonNull Pk id) {
+        return existsById(id);
     }
 
 
