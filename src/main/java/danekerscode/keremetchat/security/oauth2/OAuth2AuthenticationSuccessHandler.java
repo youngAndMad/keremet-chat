@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -31,10 +30,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             HttpServletResponse response,
             Authentication authentication
     ) throws IOException {
-        if (authentication instanceof DefaultOAuth2User oAuth2User){
+        if (authentication instanceof DefaultOAuth2User oAuth2User) {
             var username = oAuth2User.getName();
 
-            if (userRepository.existsByUsername(username)){
+            if (userRepository.existsByUsername(username)) {
                 return;
             }
 
@@ -44,7 +43,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             userRepository.save(user);
         }
 
-        if (authentication instanceof OAuth2AuthenticationToken auth2AuthenticationToken){
+        if (authentication instanceof OAuth2AuthenticationToken auth2AuthenticationToken) {
             var principal = auth2AuthenticationToken.getPrincipal();
             var username = principal.getName();
 
@@ -60,15 +59,19 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             return;
         }
 
-        clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        this.clearAuthenticationAttributes(request, response);
+        super.getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        var redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(Cookie::getValue);
-
-        return redirectUri.orElse(getDefaultTargetUrl());
+    protected String determineTargetUrl(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) {
+        return CookieUtils
+                .getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue)
+                .orElse(super.getDefaultTargetUrl());
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

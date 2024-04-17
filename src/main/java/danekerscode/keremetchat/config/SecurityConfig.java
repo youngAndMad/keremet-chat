@@ -3,7 +3,6 @@ package danekerscode.keremetchat.config;
 import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -38,7 +35,6 @@ import java.util.List;
         jsr250Enabled = true,
         securedEnabled = true
 )
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private static final List<String> publicEndpoints = new ArrayList<>() {{
@@ -61,7 +57,6 @@ public class SecurityConfig {
     }
 
     @Bean
-//    @Order(1)
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
@@ -76,12 +71,14 @@ public class SecurityConfig {
                                 .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .anyRequest().authenticated())
-                .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login(oauth2 ->
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler)
                                 .permitAll()
-                                .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(authorizationRequestRepository))
+                                .authorizationEndpoint(
+                                        authEndpoint -> authEndpoint.authorizationRequestRepository(authorizationRequestRepository)
+                                )
                 )
                 /*
                  * If you request POST /logout, then it will perform the following default operations using a series of LogoutHandlers:
@@ -102,11 +99,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-
-    private static HttpStatusEntryPoint getAuthenticationEntryPoint() {
-        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
-    }
-
     @Bean
     AuthenticationProvider daoAuthenticationProvider(CustomUserDetailsService userDetailsService) {
         var authenticationProvider = new DaoAuthenticationProvider();
@@ -122,7 +114,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityContextRepository securityContextRepository() {
+    SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
 }

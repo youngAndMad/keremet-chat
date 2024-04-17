@@ -1,13 +1,15 @@
 package danekerscode.keremetchat.common;
 
-import lombok.experimental.UtilityClass;
+import danekerscode.keremetchat.model.UserActivity;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@UtilityClass
-public class AppConstants {
-    public static final String ROLE_CLAIM = "role";
-    public static final String TOKEN_TYPE_CLAIM = "tokenType";
-    public static final String ACCESS_TOKEN = "accessToken";
-    public static final String REFRESH_TOKEN = "refreshToken";
-    public static final String INTERNAL_TOKEN_PREFIX = "Internal ";
+@RequiredArgsConstructor
+@Getter
+public enum AppConstants {
+    USER_ACTIVITY_REDIS_SET("user_activity");
+
+    private final String value;
+
 }
 
