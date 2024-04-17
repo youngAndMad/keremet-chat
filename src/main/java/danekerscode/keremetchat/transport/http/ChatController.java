@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.controller;
+package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.common.annotation.FetchUserContext;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;

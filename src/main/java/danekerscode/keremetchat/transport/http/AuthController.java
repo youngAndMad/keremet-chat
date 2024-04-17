@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.controller;
+package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.common.annotation.FetchUserContext;
 import danekerscode.keremetchat.context.UserContextHolder;
@@ -61,7 +61,7 @@ public class AuthController {
         );
 
         var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        var securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
     }

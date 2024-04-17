@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.controller.advice;
+package danekerscode.keremetchat.transport.http.advice;
 
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.exception.OtpException;
