@@ -23,6 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 import java.util.ArrayList;
@@ -68,7 +71,6 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-
                 .authorizeHttpRequests(auth ->
                         auth
                                 .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
@@ -91,7 +93,11 @@ public class SecurityConfig {
                  * Fire a LogoutSuccessEvent (LogoutSuccessEventPublishingLogoutHandler)
                  * Once completed, then it will exercise its default LogoutSuccessHandler which redirects to /login?logout.
                  */
-                .logout(logoutSettings -> logoutSettings.logoutUrl("/api/v1/auth/logout").permitAll());
+                .logout(logoutSettings -> logoutSettings
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                        .logoutUrl("/api/v1/auth/logout")
+                        .permitAll()
+                );
 
         return http.build();
     }
@@ -113,6 +119,11 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y);
+    }
+
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
     }
 }
 
