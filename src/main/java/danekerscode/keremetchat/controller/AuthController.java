@@ -8,8 +8,15 @@ import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("register")
     @Operation(description = "Register a new user", responses = {
@@ -45,10 +53,22 @@ public class AuthController {
     @Operation(description = "Login", responses = {
             @ApiResponse(responseCode = "200", description = "Login successful")
     })
-    User login(
-            @RequestBody LoginRequest loginRequest
+    void login(
+            @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
-        return authService.login(loginRequest);
+        var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.email(),loginRequest.password()
+        );
+
+        var session = request.getSession(true);
+        var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
+        var cookie = new Cookie("JSESSIONID", session.getId());
+        response.addCookie(cookie);
     }
 
 

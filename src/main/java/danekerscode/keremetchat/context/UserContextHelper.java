@@ -39,6 +39,11 @@ public class UserContextHelper {
             return userRepository.findByUsername( username).orElseThrow(() -> new RuntimeException("User not found"));
         }
 
+        if (currentAuthPrincipal instanceof  org.springframework.security.core.userdetails.User user) {
+            var email = user.getUsername();
+            return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        }
+
         throw new RuntimeException("Not supported authentication type for user extraction %s".formatted(currentAuthPrincipal.getClass().getName()));
     }
 

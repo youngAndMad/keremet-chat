@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
     private final UserMapper userMapper;
 
@@ -57,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 
         var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
 
-        var securityContext = SecurityContextHolder.createEmptyContext();
+        var securityContext = this.securityContextHolderStrategy.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
         return userService.findByEmail(loginRequest.email());

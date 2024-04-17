@@ -4,9 +4,9 @@ import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -16,18 +16,21 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableRedisHttpSession
 @EnableMethodSecurity(
         jsr250Enabled = true,
         securedEnabled = true
@@ -44,7 +47,7 @@ public class SecurityConfig {
     }};
 
     @Bean
-    public AuthenticationManager authenticationManager(
+    AuthenticationManager authenticationManager(
             HttpSecurity http,
             AuthenticationProvider daoAuthenticationProvider
     )
@@ -55,31 +58,29 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(2)
-    public SecurityFilterChain oauth2FilterChain(
+//    @Order(1)
+    SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler successHandler,
-            HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository
+            HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers(
-                                        "/error",
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**"
-                                ).permitAll()
+                                .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
                 .oauth2Login(oauth2 ->
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler)
-                                .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                                .permitAll()
+                                .authorizationEndpoint(authEndpoint -> authEndpoint.authorizationRequestRepository(authorizationRequestRepository))
                 )
-
                 /*
                  * If you request POST /logout, then it will perform the following default operations using a series of LogoutHandlers:
                  * Invalidate the HTTP session (SecurityContextLogoutHandler)
@@ -95,22 +96,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    @Order(1)
-    SecurityFilterChain sessionFilterChain(HttpSecurity http)
-            throws Exception {
-
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(e -> e.authenticationEntryPoint(getAuthenticationEntryPoint()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
-                        .anyRequest().authenticated());
-
-        return http.build();
-    }
 
     private static HttpStatusEntryPoint getAuthenticationEntryPoint() {
         return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
