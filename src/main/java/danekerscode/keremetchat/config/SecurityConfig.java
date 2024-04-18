@@ -37,13 +37,15 @@ import java.util.List;
 )
 public class SecurityConfig {
 
-    private static final List<String> publicEndpoints = new ArrayList<>() {{
-        add("/error");
-        add("/swagger-ui/**");
-        add("/v3/api-docs/**");
-        add("/api/v1/auth/register");
-        add("/api/v1/auth/login");
-    }};
+    private static final String[] publicEndpoints = {
+            "/error",
+            "/actuator/**",
+            "/keremet-chat/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api/v1/auth/register",
+            "/api/v1/auth/login"
+    };
 
     @Bean
     AuthenticationManager authenticationManager(
@@ -68,7 +70,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers(publicEndpoints.toArray(new String[0])).permitAll()
+                                .requestMatchers(publicEndpoints).permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

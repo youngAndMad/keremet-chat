@@ -1,8 +1,13 @@
 server:
+  servlet:
+    session:
+      cookie:
+        http-only: false
   port: 8081
 logging:
   level:
     org.springframework:
+      web.socket: debug
       web: DEBUG
       security: trace
       session: debug
@@ -29,6 +34,7 @@ spring:
     redis:
       time-to-live: 3600000
   session:
+
     timeout: 43200m
   liquibase:
     database-change-log-lock-table: db_changelog_lock
@@ -58,7 +64,7 @@ spring:
 
 app:
   ws:
-    allowed-origins: http://localhost:5173
+    allowed-origins: 'http://localhost:5173/'
 
 cors:
   allowCredentials: true
