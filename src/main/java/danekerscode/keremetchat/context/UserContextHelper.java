@@ -47,4 +47,5 @@ public class UserContextHelper {
         throw new RuntimeException("Not supported authentication type for user extraction %s".formatted(currentAuthPrincipal.getClass().getName()));
     }
 
+
 }

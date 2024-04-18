@@ -28,12 +28,12 @@ public class CookieUtils {
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
         Arrays.stream(request.getCookies())
                 .filter(cookie -> cookie.getName().equals(name))
-                .forEach(cookie -> {
+                .peek(cookie -> {
                     cookie.setValue("");
                     cookie.setPath("/");
                     cookie.setMaxAge(0);
-                    response.addCookie(cookie);
-                });
+                })
+                .forEach(response::addCookie);
     }
 
     public static String serialize(Object object) {
@@ -43,7 +43,7 @@ public class CookieUtils {
 
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
         return cls.cast(SerializationUtils.deserialize(
-                        Base64.getUrlDecoder().decode(cookie.getValue())));
+                Base64.getUrlDecoder().decode(cookie.getValue())));
     }
 
 
