@@ -38,6 +38,7 @@ public class UserStatusServiceImpl implements UserStatusService {
 
         var userActivity = UserActivity
                 .defaultUserActivityForUserId(userId)
+                .withLastActive(currentDateTime.get())
                 .withOnline(true);
 
         this.saveUserActivity(userActivity);
@@ -59,7 +60,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     private void clearUserActivity(Long userId) {
-        log.info("Clearing user activity for user id: {}", userId);
+        this.log.info("Clearing user activity for user id: {}", userId);
         this.redisTemplate.opsForHash()
                 .delete(AppConstants.USER_ACTIVITY_REDIS_SET.getValue(), userId.toString());
     }
