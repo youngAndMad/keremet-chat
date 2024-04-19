@@ -5,7 +5,6 @@ import danekerscode.keremetchat.service.UserService;
 import danekerscode.keremetchat.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +29,15 @@ public class UserController {
     }
 
     @Operation(
-            security = @SecurityRequirement(name = "ROLE_APPLICATION_ROOT_ADMIN"),
             summary = "Delete user by id",
             responses = {
-                    @ApiResponse(responseCode = "204" , description = "User deleted")
+                    @ApiResponse(responseCode = "204", description = "User deleted")
             }
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{userId}")
     @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
-    void deleteUser(@PathVariable Long userId){
+    void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
     }
 }
