@@ -25,9 +25,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 @EnableRedisHttpSession
@@ -44,7 +41,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/v1/auth/register",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/api/v1/user/status/{userId}"
     };
 
     @Bean

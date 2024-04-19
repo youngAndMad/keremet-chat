@@ -4,6 +4,7 @@ import danekerscode.keremetchat.common.AppConstants;
 import danekerscode.keremetchat.model.entity.SecurityRole;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
+import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthTypeService;
 import danekerscode.keremetchat.service.SecurityRoleService;
@@ -60,5 +61,16 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         log.info("Application root admin registered. Email = {}", email);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        var userExists = this.userRepository.existsById(id);
+
+        if (!userExists){
+            throw new EntityNotFoundException(User.class,id);
+        }
+
+        this.userRepository.deleteById(id);
     }
 }

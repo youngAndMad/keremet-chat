@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.config.websocket;
 
+import danekerscode.keremetchat.config.properties.AppProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +18,7 @@ import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private static final StompSubProtocolErrorHandler STOMP_SUB_PROTOCOL_ERROR_HANDLER = new StompSubProtocolErrorHandler();
-
-    @Value("${app.ws.allowed-origins}")
-    private String[] allowedOrigins;
-
+    private final AppProperties appProperties;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -30,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/keremet-chat")
-                .setAllowedOriginPatterns(allowedOrigins)
+                .setAllowedOriginPatterns(appProperties.getWebsocket().getAllowedOrigins())
                 .withSockJS()
                 .setSessionCookieNeeded(true);
 

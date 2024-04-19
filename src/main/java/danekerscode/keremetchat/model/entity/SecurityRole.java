@@ -4,11 +4,12 @@ import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Getter
 @Setter
-public class SecurityRole extends BaseEntity{
+public class SecurityRole extends BaseEntity implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,4 +17,9 @@ public class SecurityRole extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     private SecurityRoleType type;
+
+    @Override
+    public String getAuthority() {
+        return type.name();
+    }
 }

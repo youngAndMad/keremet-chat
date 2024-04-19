@@ -12,4 +12,6 @@ public interface UserService {
         String email,
         String password
     );
+
+    void deleteUser(Long id);
 }
