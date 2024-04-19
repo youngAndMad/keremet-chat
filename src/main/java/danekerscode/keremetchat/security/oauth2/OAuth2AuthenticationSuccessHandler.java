@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.security.oauth2;
 
+import danekerscode.keremetchat.common.AppConstants;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthTypeService;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 @RequiredArgsConstructor
@@ -71,9 +71,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             Authentication authentication
     ) {
         return CookieUtils
-                .getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .getCookie(request, AppConstants.REDIRECT_URI_PARAM_COOKIE_NAME.getValue())
                 .map(Cookie::getValue)
-                .orElse("/api/v1/auth/me");
+                .orElse(AppConstants.DEFAULT_SUCCESS_LOGIN_REDIRECT_URL.getValue());
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
