@@ -4,17 +4,18 @@ package danekerscode.keremetchat.transport.websocket;
 import danekerscode.keremetchat.common.helper.UserContextHelper;
 import danekerscode.keremetchat.common.helper.WebSocketMessagingHelper;
 import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.model.enums.websocket.WebSocketDestinationType;
-import lombok.Setter;
+import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 @Component
-@Setter
 public sealed abstract class AbstractWebSocketController permits
     MessageController,NotificationController,UserStatusController {
 
+    @Autowired
     private UserContextHelper userContextHelper;
+    @Autowired
     private WebSocketMessagingHelper webSocketMessagingHelper;
 
     protected User getUserFromAuthentication(Authentication auth) {
@@ -23,11 +24,11 @@ public sealed abstract class AbstractWebSocketController permits
 
     protected void deliverWebSocketMessage(
             Object data,
-            WebSocketDestinationType webSocketDestinationType,
+            WebSocketDestination webSocketDestination,
             Long... destinationIdentifiers
     ){
-        this.webSocketMessagingHelper.deliver(data,webSocketDestinationType,destinationIdentifiers);
+        this.webSocketMessagingHelper
+                .deliver(data, webSocketDestination,destinationIdentifiers);
     }
-
 
 }

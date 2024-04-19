@@ -1,16 +1,17 @@
 package danekerscode.keremetchat.model.enums.websocket;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public enum WebSocketDestinationType {
-    NOTIFICATION_NOTIFICATION("/user/notification/{userId}", DestinationType.PRIVATE, "{userid}");
-
-
+public enum WebSocketDestination {
+    USER_NOTIFICATION("/user/notification/{userId}", DestinationType.PRIVATE, "{userid}");
+    @NotNull
     private final String destination;
+    @NotNull
     private final DestinationType destinationType;
     @Nullable
     private final String identifier;

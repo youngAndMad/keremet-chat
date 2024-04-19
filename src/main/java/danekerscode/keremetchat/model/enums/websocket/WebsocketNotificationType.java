@@ -9,15 +9,15 @@ import java.util.List;
 @Getter
 public enum WebsocketNotificationType {
     TYPING(true, List.of(
-            WebSocketDestinationType.DestinationType.CHAT_BASED,
-            WebSocketDestinationType.DestinationType.PRIVATE
+            WebSocketDestination.DestinationType.CHAT_BASED,
+            WebSocketDestination.DestinationType.PRIVATE
     )); // todo add more websocket notification types
 
     private final boolean isRealTime;
-    private final List<WebSocketDestinationType.DestinationType> destinationTypes;
+    private final List<WebSocketDestination.DestinationType> destinationTypes;
 
     public boolean isGlobalNotification(){
-        return getDestinationTypes().contains(WebSocketDestinationType.DestinationType.GLOBAL);
+        return getDestinationTypes().contains(WebSocketDestination.DestinationType.GLOBAL);
     }
 
 }

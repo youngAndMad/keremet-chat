@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.transport.websocket;
 
+import danekerscode.keremetchat.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -12,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/message/{chatId}")
 public final class MessageController extends AbstractWebSocketController{
 
+//    private final MessageService messageService;
 
     @MessageMapping
     void sendMessage(
             @DestinationVariable String chatId,
             Authentication auth
     ) {
+        var user = super.getUserFromAuthentication(auth);
     }
 
 }
