@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AppConstants {
 
+    USER_NOTIFICATIONS_REDIS_HASH("user_notification"),
     USER_ACTIVITY_REDIS_HASH("user_activity");
 
     private final String value;
