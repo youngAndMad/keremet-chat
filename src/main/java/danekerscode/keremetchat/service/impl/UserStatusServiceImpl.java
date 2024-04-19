@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,13 +17,13 @@ import java.util.function.Supplier;
 @Slf4j
 public class UserStatusServiceImpl implements UserStatusService {
 
-    private final RedisTemplate<String,UserActivity> redisTemplate;
+    private final RedisTemplate<String, UserActivity> redisTemplate;
     private final Supplier<LocalDateTime> currentDateTime = LocalDateTime::now;
 
     @Override
     public UserActivity getUserActivity(Long userId) {
         var nullableUserActivity = Optional.ofNullable(
-                this.redisTemplate.opsForHash().get(AppConstants.USER_ACTIVITY_REDIS_SET.getValue(), userId.toString())
+                this.redisTemplate.opsForHash().get(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId.toString())
         );
 
         return nullableUserActivity
@@ -60,14 +59,14 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     private void clearUserActivity(Long userId) {
-        this.log.info("Clearing user activity for user id: {}", userId);
+        log.info("Clearing user activity for user id: {}", userId);
         this.redisTemplate.opsForHash()
-                .delete(AppConstants.USER_ACTIVITY_REDIS_SET.getValue(), userId.toString());
+                .delete(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId.toString());
     }
 
     private void saveUserActivity(UserActivity userActivity) {
         log.info("Saving user activity: {}", userActivity);
         this.redisTemplate.opsForHash()
-                .put(AppConstants.USER_ACTIVITY_REDIS_SET.getValue(), userActivity.getUserId().toString(), userActivity);
+                .put(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userActivity.getUserId().toString(), userActivity);
     }
 }
