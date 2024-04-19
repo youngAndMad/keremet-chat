@@ -2,6 +2,7 @@ package danekerscode.keremetchat.security.oauth2;
 
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
+import danekerscode.keremetchat.service.AuthTypeService;
 import danekerscode.keremetchat.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final UserRepository userRepository;
+    private final AuthTypeService authTypeService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -38,7 +40,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
 
             var user = new User();
-            user.setAuthType("GITHUB");
+            user.setAuthType(authTypeService.getOrCreateByName("github")); // todo extract registration id
             user.setUsername(username);
             userRepository.save(user);
         }
@@ -48,7 +50,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             var username = principal.getName();
 
             var user = new User();
-            user.setAuthType("GITHUB");
+            user.setAuthType(authTypeService.getOrCreateByName(auth2AuthenticationToken.getAuthorizedClientRegistrationId())); // todo extract registration id
             user.setUsername(username);
             userRepository.save(user);
         }

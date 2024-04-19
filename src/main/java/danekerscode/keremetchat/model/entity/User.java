@@ -18,5 +18,7 @@ public class User extends BaseEntity {
     private String username;
     @JsonIgnore
     private String password;
-    private String authType = "MANUAL";
+    @ManyToOne
+    @JoinColumn(name = "auth_type_id" , referencedColumnName = "id")
+    private AuthType authType;
 }
