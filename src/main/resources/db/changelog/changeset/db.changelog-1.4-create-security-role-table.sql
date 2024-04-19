@@ -9,6 +9,13 @@ create table security_role
 );
 --rollback drop table security_role;
 
+--changeset youngAndMad:insert-base-security-roles
+insert into security_role(created_date, type)
+values (current_timestamp,'ROLE_APPLICATION_ROOT_ADMIN'),
+       (current_timestamp,'ROLE_APPLICATION_MANAGER'),
+       (current_timestamp,'ROLE_USER');
+--drop table truncate table security_role;
+
 --changeset youngAndMad:create-users-security-roles-table
 create table users_security_roles
 (

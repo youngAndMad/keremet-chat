@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.context;
+package danekerscode.keremetchat.context.holder;
 
 import danekerscode.keremetchat.model.entity.User;
 import lombok.experimental.UtilityClass;

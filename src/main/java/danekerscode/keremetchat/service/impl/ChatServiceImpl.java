@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.context.UserContextHolder;
+import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
 import danekerscode.keremetchat.model.entity.Chat;
