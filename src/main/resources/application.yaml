@@ -34,7 +34,6 @@ spring:
     redis:
       time-to-live: 3600000
   session:
-
     timeout: 43200m
   liquibase:
     database-change-log-lock-table: db_changelog_lock
@@ -65,6 +64,11 @@ spring:
 app:
   ws:
     allowed-origins: 'http://localhost:5173/'
+  security:
+    default-admin:
+      email: 'kkraken2005@gmail.com'
+      password: 'keremetchatadmin'
+
 
 cors:
   allowCredentials: true
