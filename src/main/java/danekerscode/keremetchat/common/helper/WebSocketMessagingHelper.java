@@ -17,7 +17,7 @@ public class WebSocketMessagingHelper {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public void deliver(
+    private void deliver(
             Object data,
             WebSocketDestinationType webSocketDestinationType,
             Long destinationIdentifier

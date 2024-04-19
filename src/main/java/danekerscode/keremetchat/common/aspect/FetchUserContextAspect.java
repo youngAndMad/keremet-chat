@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.common.aspect;
 
-import danekerscode.keremetchat.context.UserContextHelper;
+import danekerscode.keremetchat.common.helper.UserContextHelper;
 import danekerscode.keremetchat.context.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
