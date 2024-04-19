@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Controller
 @RequiredArgsConstructor
-public class NotificationController {
+public final class NotificationController extends AbstractWebSocketController{
 
 
     @MessageMapping("/notification/send")
