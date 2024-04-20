@@ -13,6 +13,4 @@ public record ClientRegistrationRequest(
         String clientSecret,
         @NotNull @NotEmpty
         String registrationId
-){
-
-}
+){ }

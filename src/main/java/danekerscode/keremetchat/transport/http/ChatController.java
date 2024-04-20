@@ -5,6 +5,9 @@ import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
 import danekerscode.keremetchat.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +27,15 @@ public class ChatController {
     @FetchUserContext
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create a private chat", responses = {
-            @ApiResponse(responseCode = "201", description = "Chat created")
+            @ApiResponse(responseCode = "201", description = "Chat created",
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Create chat response",
+                                            value = "{\"id\": 1}",
+                                            description = "id: identifier of created chat")
+                            })
+            )
     })
     IdDto<Long> createChat(
             @RequestBody @Validated CreatePrivateChatRequest createChatRequest
