@@ -64,6 +64,10 @@ spring:
     url: jdbc:postgresql://localhost:5433/keremet_chat
 
 app:
+  minio:
+    url: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
   open-api:
     info:
       title: Keremet Chat api documentation

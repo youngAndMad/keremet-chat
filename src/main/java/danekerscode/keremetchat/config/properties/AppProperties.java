@@ -13,6 +13,7 @@ public class AppProperties {
 
     private OpenApiConfig openApi;
     private WebsocketConfig websocket;
+    private MinioConfig minio;
 
     @Data
     public static class OpenApiConfig{
@@ -22,5 +23,12 @@ public class AppProperties {
     @Data
     public static class WebsocketConfig{
         private String[] allowedOrigins;
+    }
+
+    @Data
+    public static class MinioConfig{
+        private String url;
+        private String accessKey;
+        private String secretKey;
     }
 }

@@ -77,7 +77,7 @@ public class SecurityConfig {
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
-            OAuth2AuthenticationSuccessHandler successHandler,
+            OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
             HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository
     ) throws Exception {
         http
@@ -91,7 +91,7 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login(oauth2 ->
                         oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(successHandler)
+                                .successHandler(authenticationSuccessHandler)
                                 .permitAll()
                                 .authorizationEndpoint(
                                         authEndpoint -> authEndpoint

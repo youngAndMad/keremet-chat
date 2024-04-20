@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AppConstants {
 
+    MINIO_DEFAULT_BUCKET("keremetchat"),
+
     DEFAULT_SUCCESS_LOGIN_REDIRECT_URL("/api/v1/auth/me"),
 
     MANUAL_AUTH_TYPE("MANUAL"),
