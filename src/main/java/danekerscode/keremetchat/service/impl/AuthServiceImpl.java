@@ -1,8 +1,10 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.common.mapper.UserMapper;
+import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
+import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
@@ -57,6 +59,18 @@ public class AuthServiceImpl implements AuthService {
         var securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        var currentUser = UserContextHolder.getContext();
+
+        if (!passwordEncoder.matches(resetPasswordRequest.oldPassword(), currentUser.getPassword())) {
+            throw new AuthProcessingException("Old password is incorrect", HttpStatus.BAD_REQUEST);
+        }
+
+        currentUser.setPassword(passwordEncoder.encode(resetPasswordRequest.newPassword()));
+        userRepository.save(currentUser);
     }
 
 }

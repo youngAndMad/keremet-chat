@@ -4,6 +4,7 @@ import danekerscode.keremetchat.common.annotation.FetchUserContext;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
+import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,5 +53,14 @@ public class AuthController {
             HttpServletResponse response
     ) {
         authService.login(loginRequest, request, response);
+    }
+
+    @PostMapping("reset-password")
+    @Operation(description = "Reset password", responses = {
+            @ApiResponse(responseCode = "200", description = "Password reset")
+    })
+    @FetchUserContext
+    void resetPassword(@RequestBody @Validated ResetPasswordRequest resetPasswordRequest) {
+        authService.resetPassword(resetPasswordRequest);
     }
 }
