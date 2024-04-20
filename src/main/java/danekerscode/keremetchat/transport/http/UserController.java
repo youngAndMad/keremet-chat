@@ -1,5 +1,7 @@
 package danekerscode.keremetchat.transport.http;
 
+import danekerscode.keremetchat.common.annotation.FetchUserContext;
+import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.service.UserService;
 import danekerscode.keremetchat.service.UserStatusService;
@@ -10,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -38,8 +39,8 @@ public class UserController {
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{userId}")
-    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
+    @FetchUserContext
     void deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, UserContextHolder.getContext());
     }
 }

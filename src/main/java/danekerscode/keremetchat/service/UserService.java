@@ -13,5 +13,5 @@ public interface UserService {
         String password
     );
 
-    void deleteUser(Long id);
+    void deleteUser(Long id, User currentUser);
 }

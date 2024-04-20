@@ -64,11 +64,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id, User currentUser) {
         var userExists = this.userRepository.existsById(id);
 
-        if (!userExists){
-            throw new EntityNotFoundException(User.class,id);
+        if (!userExists) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        if (!currentUser.getId().equals(id) ||
+                currentUser.getRoles().stream().noneMatch(role -> role.getType().equals(SecurityRoleType.ROLE_APPLICATION_ROOT_ADMIN))) {
+            throw new RuntimeException("You can't delete yourself");
         }
 
         this.userRepository.deleteById(id);
