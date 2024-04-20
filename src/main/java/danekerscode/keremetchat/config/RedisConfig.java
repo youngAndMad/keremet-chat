@@ -13,7 +13,7 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
-    private static final int CACHE_TTL = 60;
+    private static final int CACHE_TTL = 10;
 
     @Bean
     RedisCacheConfiguration redisCacheConfiguration() {

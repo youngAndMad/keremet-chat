@@ -4,6 +4,7 @@ import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -17,6 +18,7 @@ public class UserContextHelper {
 
     private final UserRepository userRepository;
 
+    @Cacheable(value = "userPrincipal", key = "#authentication.principal")
     public User extractUser(Authentication authentication) {
         var currentAuthPrincipal = authentication.getPrincipal();
         if (currentAuthPrincipal instanceof OAuth2AuthenticationToken oauth2Token) {
