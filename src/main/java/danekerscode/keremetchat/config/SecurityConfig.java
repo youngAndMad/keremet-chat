@@ -1,12 +1,14 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.security.CustomUserDetailsService;
+import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -18,6 +20,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -57,6 +60,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    ClientRegistrationRepository clientRegistrationRepository(JdbcOperations jdbcOperations) {
+        return new JdbcClientRegistrationRepository(jdbcOperations);
+    }
+
+    @Bean
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
@@ -77,7 +85,8 @@ public class SecurityConfig {
                                 .successHandler(successHandler)
                                 .permitAll()
                                 .authorizationEndpoint(
-                                        authEndpoint -> authEndpoint.authorizationRequestRepository(authorizationRequestRepository)
+                                        authEndpoint -> authEndpoint
+                                                .authorizationRequestRepository(authorizationRequestRepository)
                                 )
                 )
                 /*
@@ -114,7 +123,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityContextRepository securityContextRepository() {
+    SecurityContextRepository securityContextRepository(
+            ClientRegistrationRepository clientRegistrationRepository
+    ) {
         return new HttpSessionSecurityContextRepository();
     }
 }
