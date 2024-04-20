@@ -18,6 +18,9 @@ public class Chat extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ChatType type;
     private String name;
+
+    private String avatarUrl;
+
     @OneToMany(mappedBy = "chat")
     private List<ChatMember> members;
 }
