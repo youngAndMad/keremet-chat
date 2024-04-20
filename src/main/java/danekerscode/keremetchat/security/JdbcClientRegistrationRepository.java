@@ -3,6 +3,7 @@ package danekerscode.keremetchat.security;
 import danekerscode.keremetchat.utils.ClientRegistrationParametersMapper;
 import danekerscode.keremetchat.utils.ClientRegistrationRowMapper;
 import jakarta.annotation.Nonnull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,10 +13,12 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
+@Slf4j
 public class JdbcClientRegistrationRepository implements ClientRegistrationRepository,
         Iterable<ClientRegistration> {
 
@@ -35,11 +38,13 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
     private final RowMapper<ClientRegistration> clientRegistrationRowMapper;
 
 
-    public JdbcClientRegistrationRepository(JdbcOperations jdbcOperations) {
+    public JdbcClientRegistrationRepository(JdbcOperations jdbcOperations, Collection<ClientRegistration> clientRegistrations) {
         Assert.notNull(jdbcOperations, "JdbcOperations can not be null");
         this.jdbcOperations = jdbcOperations;
         this.clientRegistrationRowMapper = new ClientRegistrationRowMapper();
         this.clientRegistrationListParametersMapper = new ClientRegistrationParametersMapper();
+
+        clientRegistrations.forEach(this::persist);
     }
 
     @Override
@@ -53,14 +58,22 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
         return !result.isEmpty() ? result.get(0) : null;
     }
 
+    public void delete(String registrationId) {
+        Assert.hasText(registrationId, "registrationId cannot be empty");
+        var deletionResult = this.jdbcOperations.update("DELETE FROM " + TABLE_NAME + " WHERE registration_id = ?", registrationId);
 
-    public void save(ClientRegistration clientRegistration) {
+        log.info("Client registration with registrationId {} deleted, effected rows {}", registrationId, deletionResult);
+    }
+
+    public boolean persist(ClientRegistration clientRegistration) {
         Assert.notNull(clientRegistration, "clientRegistration cannot be null");
         var existingClientRegistration = this.findByRegistrationId(clientRegistration.getRegistrationId());
         if (existingClientRegistration != null) {
             this.updateRegisteredClient(clientRegistration);
+            return false;
         } else {
             this.insertClientRegistration(clientRegistration);
+            return true;
         }
     }
 

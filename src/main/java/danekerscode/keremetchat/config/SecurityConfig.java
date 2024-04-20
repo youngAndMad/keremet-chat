@@ -4,6 +4,8 @@ import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -27,6 +30,9 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -60,8 +66,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    ClientRegistrationRepository clientRegistrationRepository(JdbcOperations jdbcOperations) {
-        return new JdbcClientRegistrationRepository(jdbcOperations);
+    JdbcClientRegistrationRepository clientRegistrationRepository(
+            JdbcOperations jdbcOperations,
+            OAuth2ClientProperties oAuth2ClientProperties
+    ) {
+        var oAuth2ClientPropertiesMapper = new OAuth2ClientPropertiesMapper(oAuth2ClientProperties);
+        return new JdbcClientRegistrationRepository(jdbcOperations,oAuth2ClientPropertiesMapper.asClientRegistrations().values());
     }
 
     @Bean
