@@ -2,16 +2,16 @@
 --changeset youngAndMad:create-oauth2_client_registered-table
 CREATE TABLE oauth2_client_registered
 (
-    registration_id                 VARCHAR(100)  NOT NULL PRIMARY KEY,
-    client_id                       VARCHAR(100)  NOT NULL,
+    registration_id                 VARCHAR(100) PRIMARY KEY,
+    client_id                       VARCHAR(100),
     client_secret                   VARCHAR(200),
-    client_authentication_method    VARCHAR(100)  NOT NULL,
-    authorization_grant_type        VARCHAR(100)  NOT NULL,
+    client_authentication_method    VARCHAR(100),
+    authorization_grant_type        VARCHAR(100),
     client_name                     VARCHAR(200),
-    redirect_uri                    VARCHAR(1000) NOT NULL,
-    scopes                          VARCHAR(1000) NOT NULL,
+    redirect_uri                    VARCHAR(1000),
+    scopes                          VARCHAR(1000),
     authorization_uri               VARCHAR(1000),
-    token_uri                       VARCHAR(1000) NOT NULL,
+    token_uri                       VARCHAR(1000),
     jwk_set_uri                     VARCHAR(1000),
     issuer_uri                      VARCHAR(1000),
     user_info_uri                   VARCHAR(1000),

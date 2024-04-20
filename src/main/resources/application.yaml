@@ -10,7 +10,6 @@ logging:
       web.socket: debug
       web: DEBUG
       security: trace
-      session: debug
 
 spring:
   main:

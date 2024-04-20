@@ -1,5 +1,7 @@
 package danekerscode.keremetchat.service.impl;
 
+import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
+import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,13 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     private final JdbcClientRegistrationRepository clientRegistrationRepository;
 
     @Override
-    public boolean save(ClientRegistration clientRegistration) {
+    public boolean save(ClientRegistrationRequest clientRegistrationRequest) {
+        var clientRegistration = clientRegistrationRequest.provider()
+                .getBuilder(clientRegistrationRequest.registrationId())
+                .clientId(clientRegistrationRequest.clientId())
+                .clientSecret(clientRegistrationRequest.clientSecret())
+                .build();
+
         var alreadyExists = clientRegistrationRepository.persist(clientRegistration);
 
         log.info(
@@ -40,8 +48,14 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     }
 
     @Override
-    public void update(ClientRegistration clientRegistration) {
-        this.save(clientRegistration);//todo
+    public void update(ClientRegistrationRequest clientRegistrationRequest) {
+        var clientRegistration = clientRegistrationRepository.findByRegistrationId(clientRegistrationRequest.registrationId());
+
+        if (clientRegistration == null) {
+            throw new EntityNotFoundException(ClientRegistration.class, clientRegistrationRequest.registrationId());
+        }
+
+        clientRegistrationRepository.persist(clientRegistration);
     }
 
     @Override

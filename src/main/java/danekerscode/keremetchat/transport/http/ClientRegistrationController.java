@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.transport.http;
 
+import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
@@ -24,9 +26,9 @@ public class ClientRegistrationController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create client registration")
     void createClientRegistration(
-            @RequestBody ClientRegistration clientRegistration
+            @RequestBody @Validated ClientRegistrationRequest clientRegistrationRequest
     ) {
-        clientRegistrationService.save(clientRegistration);
+        clientRegistrationService.save(clientRegistrationRequest);
     }
 
 
@@ -42,9 +44,9 @@ public class ClientRegistrationController {
     @PutMapping("{clientId}")
     @Operation(summary = "Update client registration")
     void updateClientRegistration(
-            @RequestBody ClientRegistration clientRegistration
+            @RequestBody @Validated ClientRegistrationRequest clientRegistrationRequest
     ) {
-        clientRegistrationService.update(clientRegistration);
+        clientRegistrationService.update(clientRegistrationRequest);
     }
 
     @GetMapping("{clientId}")
