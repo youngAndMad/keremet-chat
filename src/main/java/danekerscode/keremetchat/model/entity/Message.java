@@ -1,19 +1,26 @@
 package danekerscode.keremetchat.model.entity;
 
+import danekerscode.keremetchat.common.AppConstants;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
 public class Message extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String content;
+
+    private String content = AppConstants.EMPTY_STRING.getValue();
+    private LocalDateTime sentAt;
+    private boolean deleted;
+    private boolean edited;
 
     @ManyToOne
     @JoinColumn(name = "chat_id", referencedColumnName = "id")
@@ -31,5 +38,4 @@ public class Message extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileEntity> files;
-
 }

@@ -6,6 +6,7 @@ CREATE TABLE chat
     created_date       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_date TIMESTAMP WITHOUT TIME ZONE,
     type               VARCHAR(255),
+    avatar_url         VARCHAR(255),
     name               VARCHAR(255)
 );
 --rollback DROP TABLE chat;

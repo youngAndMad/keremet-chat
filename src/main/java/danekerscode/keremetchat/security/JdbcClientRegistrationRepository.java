@@ -28,7 +28,7 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
                     client_name,redirect_uri,scopes,authorization_uri,token_uri,jwk_set_uri,issuer_uri,user_info_uri,
                     user_info_authentication_method,user_name_attribute_name,configuration_metadata
                     """;
-    private static final String TABLE_NAME = "oauth2_client_registered";
+    private static final String TABLE_NAME = "oauth2_client_registration";
     private static final String LOAD_CLIENT_REGISTERED_SQL = "SELECT " + COLUMN_NAMES + " FROM " + TABLE_NAME;
     private static final String LOAD_CLIENT_REGISTERED_QUERY_SQL = LOAD_CLIENT_REGISTERED_SQL + " WHERE ";
     private static final String INSERT_CLIENT_REGISTERED_SQL = "INSERT INTO " + TABLE_NAME + "(" + COLUMN_NAMES + ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";

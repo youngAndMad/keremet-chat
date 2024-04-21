@@ -10,3 +10,4 @@ create table auth_type(
 
 --changeset youngAndMad:insert-default-auth-type
 insert into auth_type(created_date, name) values (current_timestamp, 'MANUAL');
+--rollback delete from auth_type where name = 'MANUAL';

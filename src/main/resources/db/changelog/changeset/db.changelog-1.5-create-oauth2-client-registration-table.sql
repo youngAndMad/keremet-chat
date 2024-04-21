@@ -1,6 +1,6 @@
 --liquibase formatted sql
---changeset youngAndMad:create-oauth2_client_registered-table
-CREATE TABLE oauth2_client_registered
+--changeset youngAndMad:create-oauth2_client_registration-table
+CREATE TABLE oauth2_client_registration
 (
     registration_id                 VARCHAR(100) PRIMARY KEY,
     client_id                       VARCHAR(100),
@@ -19,4 +19,4 @@ CREATE TABLE oauth2_client_registered
     user_name_attribute_name        VARCHAR(100),
     configuration_metadata          VARCHAR(2000)
 );
---rollback DROP TABLE oauth2_client_registered;
+--rollback DROP TABLE oauth2_client_registration;

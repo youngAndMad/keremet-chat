@@ -24,6 +24,7 @@ public class User extends BaseEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "auth_type_id" , referencedColumnName = "id")
     private AuthType authType;
+    private boolean isActive = true;
 
     @ManyToMany
     @JoinTable(
@@ -32,4 +33,7 @@ public class User extends BaseEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "security_role_id" , referencedColumnName = "id")
     )
     private Set<SecurityRole> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChatMember> chatMembers;
 }
