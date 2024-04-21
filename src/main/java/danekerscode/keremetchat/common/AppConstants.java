@@ -10,6 +10,8 @@ public enum AppConstants {
     EMPTY_STRING(""),
     MINIO_DEFAULT_BUCKET("keremet-chat"),
 
+    DEFAULT_ID_COLUMN_NAME("id"),
+
     DEFAULT_SUCCESS_LOGIN_REDIRECT_URL("/api/v1/auth/me"),
 
     MANUAL_AUTH_TYPE("MANUAL"),

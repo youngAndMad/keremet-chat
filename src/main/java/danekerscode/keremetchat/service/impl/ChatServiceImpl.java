@@ -64,4 +64,15 @@ public class ChatServiceImpl implements ChatService {
 
         chatRepository.deleteById(chatId);
     }
+
+    @Override
+    @Transactional
+    public List<Long> getMemberUsersIdList(Long chatId) {
+        return chatRepository.getMemberUsersIdList(chatId);
+    }
+
+    @Override
+    public boolean existsById(Long chatId) {
+        return chatRepository.isExistByID(chatId);
+    }
 }
