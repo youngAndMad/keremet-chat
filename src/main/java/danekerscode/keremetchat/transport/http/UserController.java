@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.transport.http;
 
+import danekerscode.keremetchat.common.annotation.AvailableForRootOrOwner;
 import danekerscode.keremetchat.common.annotation.FetchUserContext;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.UserActivity;
@@ -46,6 +47,7 @@ public class UserController {
 
     @Operation(summary = "Deactivate user by id")
     @FetchUserContext
+    @AvailableForRootOrOwner
     @PatchMapping("{userId}/deactivate")
     void deactivateUser(@PathVariable Long userId) {
         userService.deactivateUser(userId, UserContextHolder.getContext());

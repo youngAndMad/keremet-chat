@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deactivateUser(Long id, User currentUser) {
         var userExists = this.userRepository.existsById(id);
 
@@ -94,13 +96,13 @@ public class UserServiceImpl implements UserService {
             Long userId,
             String message
     ) {
-        if (!currentUser.getId().equals(userId) ||
+        if (!(currentUser.getId().equals(userId) ||
                 currentUser.getRoles().stream()
                         .noneMatch(
                                 role -> role.getType()
                                         .equals(SecurityRoleType.ROLE_APPLICATION_ROOT_ADMIN)
                         )
-        ) {
+        )) {
             throw new RuntimeException(message);
         }
     }
