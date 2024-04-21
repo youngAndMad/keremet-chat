@@ -22,17 +22,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -70,7 +65,7 @@ public class SecurityConfig {
             OAuth2ClientProperties oAuth2ClientProperties
     ) {
         var oAuth2ClientPropertiesMapper = new OAuth2ClientPropertiesMapper(oAuth2ClientProperties);
-        return new JdbcClientRegistrationRepository(jdbcOperations,oAuth2ClientPropertiesMapper.asClientRegistrations().values());
+        return new JdbcClientRegistrationRepository(jdbcOperations, oAuth2ClientPropertiesMapper.asClientRegistrations().values());
     }
 
     @Bean
@@ -132,9 +127,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityContextRepository securityContextRepository(
-            ClientRegistrationRepository clientRegistrationRepository
-    ) {
+    SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
 }
