@@ -6,13 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.io.Serializable;
-
 @Entity
 @Getter
 @Setter
 public class SecurityRole extends BaseEntity implements
-        GrantedAuthority, Serializable {
+        GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -43,4 +43,11 @@ public class UserController {
     void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId, UserContextHolder.getContext());
     }
+
+    @Operation(summary = "Deactivate user by id")
+    @FetchUserContext
+    @PatchMapping("{userId}/deactivate")
+    void deactivateUser(@PathVariable Long userId) {
+        userService.deactivateUser(userId, UserContextHolder.getContext());
+    }
 }

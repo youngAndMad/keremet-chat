@@ -71,11 +71,37 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(User.class, id);
         }
 
-        if (!currentUser.getId().equals(id) ||
-                currentUser.getRoles().stream().noneMatch(role -> role.getType().equals(SecurityRoleType.ROLE_APPLICATION_ROOT_ADMIN))) {
-            throw new RuntimeException("You can't delete yourself");
-        }
+        validatePrivateActionAccess(currentUser, id, "You can't delete yourself");
 
         this.userRepository.deleteById(id);
+    }
+
+    @Override
+    public void deactivateUser(Long id, User currentUser) {
+        var userExists = this.userRepository.existsById(id);
+
+        if (!userExists) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        validatePrivateActionAccess(currentUser, id, "You can't deactivate yourself");
+
+        this.userRepository.deactivateUser(id);
+    }
+
+    private static void validatePrivateActionAccess(
+            User currentUser,
+            Long userId,
+            String message
+    ) {
+        if (!currentUser.getId().equals(userId) ||
+                currentUser.getRoles().stream()
+                        .noneMatch(
+                                role -> role.getType()
+                                        .equals(SecurityRoleType.ROLE_APPLICATION_ROOT_ADMIN)
+                        )
+        ) {
+            throw new RuntimeException(message);
+        }
     }
 }
