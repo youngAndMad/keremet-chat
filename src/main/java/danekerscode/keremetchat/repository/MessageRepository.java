@@ -1,9 +1,9 @@
 package danekerscode.keremetchat.repository;
 
-import danekerscode.keremetchat.model.modify.message.MessageSaveRequest;
+import danekerscode.keremetchat.model.entity.Message;
+import danekerscode.keremetchat.repository.common.CommonRepository;
 
-public interface MessageRepository{
+public interface MessageRepository extends CommonRepository<Message, Long> {
 
-    Long saveMessage(MessageSaveRequest messageSaveRequest);
 
 }

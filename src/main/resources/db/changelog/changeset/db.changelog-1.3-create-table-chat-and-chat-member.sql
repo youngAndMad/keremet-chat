@@ -24,3 +24,12 @@ CREATE TABLE chat_member
     foreign key (chat_id) references chat (id)
 );
 --rollback DROP TABLE chat_member;
+
+--changeset youngAndMad:create-table-chat_message
+CREATE TABLE chat_avatars
+(
+    chat_id    BIGINT NOT NULL,
+    avatars_id BIGINT NOT NULL,
+    foreign key (chat_id) references chat (id),
+    foreign key (avatars_id) references file_entity (id)
+);

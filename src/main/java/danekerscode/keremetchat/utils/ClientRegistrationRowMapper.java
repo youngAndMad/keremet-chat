@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;

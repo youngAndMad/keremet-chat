@@ -15,6 +15,7 @@ public class FileEntity extends BaseEntity{
     private Long id;
     private String fileName;
     private String target;
+    @Enumerated(EnumType.STRING)
     private FileEntitySource source;
     private String extension;
     private long size;

@@ -1,8 +1,8 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.security.CustomUserDetailsService;
-import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
@@ -25,7 +25,7 @@ import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -33,9 +33,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -88,7 +85,8 @@ public class SecurityConfig {
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
-            HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository
+            HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
+            ClientRegistrationRepository clientRegistrationRepository
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -146,10 +144,10 @@ public class SecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
 
-    private CommonOAuth2Provider getProviderNameByRegistrationId(String registrationId){
+    private CommonOAuth2Provider getProviderNameByRegistrationId(String registrationId) {
         var provider = env.getProperty("spring.security.oauth2.client.registration." + registrationId + ".common-provider-type", CommonOAuth2Provider.class);
 
-        if(provider == null){
+        if (provider == null) {
             throw new IllegalArgumentException("Unknown provider: " + registrationId);
         }
 

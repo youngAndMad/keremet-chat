@@ -56,7 +56,7 @@ spring:
               - read:user
         provider:
           github:
-            user-name-attribute: loginы
+            user-name-attribute: login
   datasource:
     username: postgres
     password: postgres

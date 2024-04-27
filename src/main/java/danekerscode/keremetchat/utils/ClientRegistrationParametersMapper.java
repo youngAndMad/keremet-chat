@@ -1,13 +1,13 @@
 package danekerscode.keremetchat.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -24,7 +24,7 @@ public class ClientRegistrationParametersMapper
 
     @Override
     public List<SqlParameterValue> apply(ClientRegistration clientRegistration) {
-        return Arrays.asList(
+        return new ArrayList<>(List.of(
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(clientRegistration.getRegistrationId())),
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(clientRegistration.getClientId())),
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(clientRegistration.getClientSecret())),
@@ -41,7 +41,7 @@ public class ClientRegistrationParametersMapper
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(clientRegistration.getProviderDetails() == null ? null : clientRegistration.getProviderDetails().getUserInfoEndpoint().getAuthenticationMethod().getValue())),
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(clientRegistration.getProviderDetails() == null ? null : clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName())),
                 new SqlParameterValue(STRING_SQL_TYPE, getOrNull(ObjectMapperUtils.writeMap(clientRegistration.getProviderDetails() == null ? null : clientRegistration.getProviderDetails().getConfigurationMetadata())))
-        );
+        ));
     }
 
     private <T> T getOrNull(T value) {

@@ -3,7 +3,7 @@ package danekerscode.keremetchat.service.impl;
 import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
-import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

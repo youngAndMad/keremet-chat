@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.security;
+package danekerscode.keremetchat.security.oauth2;
 
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import danekerscode.keremetchat.utils.ClientRegistrationParametersMapper;
@@ -30,7 +30,7 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
     private static final String TABLE_NAME = "oauth2_client_registration";
     private static final String LOAD_CLIENT_REGISTERED_SQL = "SELECT " + COLUMN_NAMES + " FROM " + TABLE_NAME;
     private static final String LOAD_CLIENT_REGISTERED_QUERY_SQL = LOAD_CLIENT_REGISTERED_SQL + " WHERE ";
-    private static final String INSERT_CLIENT_REGISTERED_SQL = "INSERT INTO " + TABLE_NAME + "(" + COLUMN_NAMES + ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CLIENT_REGISTERED_SQL = "INSERT INTO " + TABLE_NAME + "(" + COLUMN_NAMES + ") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_CLIENT_REGISTERED_SQL = "UPDATE " + TABLE_NAME + """
              SET client_id = ?,client_secret = ?,client_authentication_method = ?,authorization_grant_type = ?,
              client_name = ?,redirect_uri = ?,scopes = ?,authorization_uri = ?,token_uri = ?,jwk_set_uri = ?,
@@ -105,6 +105,8 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
             CommonOAuth2Provider provider
     ) {
         var parameterValues = this.clientRegistrationListParametersMapper.apply(clientRegistration);
+        parameterValues.add(new SqlParameterValue(12, provider.name()));
+
         var statementSetter = new ArgumentPreparedStatementSetter(parameterValues.toArray());
         this.jdbcOperations.update(INSERT_CLIENT_REGISTERED_SQL, statementSetter);
         this.updateProviderName(provider, clientRegistration.getRegistrationId());
