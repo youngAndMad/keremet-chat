@@ -1,6 +1,8 @@
 package danekerscode.keremetchat.model.dto.request;
 
+import jakarta.validation.constraints.Email;
+
 public record CreatePrivateChatRequest(
-        String receiverEmail
+        @Email String receiverEmail
 ) {
 }

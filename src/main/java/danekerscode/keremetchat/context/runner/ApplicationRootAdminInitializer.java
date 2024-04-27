@@ -1,9 +1,5 @@
 package danekerscode.keremetchat.context.runner;
 
-import danekerscode.keremetchat.common.AppConstants;
-import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.service.AuthTypeService;
-import danekerscode.keremetchat.service.SecurityRoleService;
 import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +21,7 @@ public class ApplicationRootAdminInitializer implements ApplicationRunner {
     private String applicationRootAdminPassword;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args){
         userService.checkApplicationRootUser(applicationRootAdminEmail,applicationRootAdminPassword);
     }
 

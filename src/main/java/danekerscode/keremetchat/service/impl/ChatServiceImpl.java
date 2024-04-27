@@ -43,7 +43,7 @@ public class ChatServiceImpl implements ChatService {
 
         chat.setName(chatOwner.getUser().getUsername() + ":" + chatMember.getUser().getUsername());
         chat.setType(ChatType.PRIVATE);
-        chat.setMembers(List.of(chatOwner, chatMember));
+//        chat.setMembers(List.of(chatOwner, chatMember));
         chatRepository.save(chat);
 
         return new IdDto<>(chat.getId());
@@ -92,9 +92,12 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public void deleteAvatar(Long fileId, Long chatId) {
         this.chatRepository.checkExists(chatId);
 
         this.chatRepository.deleteAvatar(chatId,fileId);
+
+        this.fileStorageService.deleteFile(fileId);
     }
 }

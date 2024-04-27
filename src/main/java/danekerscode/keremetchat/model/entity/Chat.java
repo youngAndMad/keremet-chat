@@ -19,10 +19,15 @@ public class Chat extends BaseEntity {
     private ChatType type;
     private String name;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "chat_avatars",
+            joinColumns = @JoinColumn(name = "chat_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_entity_id")
+    )
     private List<FileEntity> avatars;
 
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMember> members;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)

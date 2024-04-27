@@ -12,6 +12,7 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -23,17 +24,17 @@ public class FileStorageServiceImpl implements FileStorageService {
     private final FileEntityRepository fileEntityRepository;
     private final MinioClient minioClient;
 
-
     @Override
     public FileEntity save(MultipartFile file, FileEntitySource source, String target) {
         try {
             var inputStream = new ByteArrayInputStream(file.getBytes());
 
-            var minioObjectPath = FileUtils.getMinioObjectPath(AppConstants.MINIO_DEFAULT_BUCKET.name(), file, source, target);
+            var minioObjectPath = FileUtils
+                    .getMinioObjectPath(AppConstants.MINIO_DEFAULT_BUCKET.getValue(), file, source, target);
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .stream(inputStream, inputStream.available(), -1)
-                            .bucket(AppConstants.MINIO_DEFAULT_BUCKET.name())
+                            .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
                             .object(minioObjectPath)
                             .build()
             );
@@ -53,6 +54,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
+    @Transactional
     public void deleteFile(Long fileEntityId) {
         var fileEntityExists = fileEntityRepository.existsById(fileEntityId);
 
@@ -60,7 +62,25 @@ public class FileStorageServiceImpl implements FileStorageService {
             throw new EntityNotFoundException(FileEntity.class, fileEntityId);
         }
 
+        var file = fileEntityRepository.findByID(fileEntityId);
+
         fileEntityRepository.deleteById(fileEntityId);
+
+        deleteFileFromMinio(file);
+    }
+
+    private void deleteFileFromMinio(FileEntity file) {
+        try {
+            minioClient.removeObject(
+                    io.minio.RemoveObjectArgs.builder()
+                            .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
+                            .object(file.getPath())
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new FileProcessException(e);
+        }
+
     }
 
     @Override

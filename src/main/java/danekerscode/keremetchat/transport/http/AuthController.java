@@ -34,8 +34,7 @@ public class AuthController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     User register(@RequestBody RegistrationRequest request) {
-        throw new AuthProcessingException("hahah", HttpStatus.I_AM_A_TEAPOT);
-//        return authService.register(request);
+        return authService.register(request);
     }
 
     @GetMapping("me")

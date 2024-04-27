@@ -57,6 +57,7 @@ public class ChatController {
     }
 
     @DeleteMapping("{id}/avatar/{fileId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     void uploadAvatar(
             @PathVariable Long id,
             @PathVariable Long fileId

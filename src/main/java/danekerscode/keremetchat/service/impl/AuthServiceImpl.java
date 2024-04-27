@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
+import danekerscode.keremetchat.common.AppConstants;
 import danekerscode.keremetchat.common.mapper.UserMapper;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
@@ -9,6 +10,7 @@ import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthService;
+import danekerscode.keremetchat.service.AuthTypeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final SecurityContextRepository securityContextRepository;
     private final AuthenticationManager authenticationManager;
+    private final AuthTypeService authTypeService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -45,7 +48,9 @@ public class AuthServiceImpl implements AuthService {
         if (userIsExistByUsername) {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
         }
+
         var mappedUser = userMapper.registrationRequestToUser(request, passwordEncoder.encode(request.password()));
+        mappedUser.setAuthType(authTypeService.getOrCreateByName(AppConstants.MANUAL_AUTH_TYPE.getValue()));
         return userRepository.save(mappedUser);
     }
 
