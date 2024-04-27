@@ -132,7 +132,11 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
     public Iterator<ClientRegistrationResponse> iterator() {
         return this.jdbcOperations
                 .query(LOAD_CLIENT_REGISTERED_SQL, this.clientRegistrationRowMapper).stream()
-                .map(c -> new ClientRegistrationResponse(c, this.getProviderName(c.getRegistrationId())))
+                .map(c -> new ClientRegistrationResponse(this.getProviderName(c.getRegistrationId()), c.getRegistrationId()))
                 .iterator();
+    }
+
+    public Collection<ClientRegistration> findAll() {
+        return this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_SQL, this.clientRegistrationRowMapper);
     }
 }

@@ -4,6 +4,7 @@ import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 public interface ClientRegistrationService {
@@ -17,4 +18,6 @@ public interface ClientRegistrationService {
     void update(ClientRegistrationRequest clientRegistrationRequest);
 
     ClientRegistration findByRegistrationId(String registrationId);
+
+    Collection<ClientRegistration> findAllForAdmin();
 }

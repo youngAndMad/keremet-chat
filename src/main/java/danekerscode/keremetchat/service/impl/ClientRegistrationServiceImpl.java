@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 @Service
@@ -54,5 +55,10 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         return clientRegistrationRepository.findByRegistrationId(registrationId);
+    }
+
+    @Override
+    public Collection<ClientRegistration> findAllForAdmin() {
+        return this.clientRegistrationRepository.findAll();
     }
 }

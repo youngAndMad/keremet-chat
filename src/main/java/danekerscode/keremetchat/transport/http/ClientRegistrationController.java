@@ -12,18 +12,19 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/client-registration")
-@PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
 @Tag(name = "Client registration")
 public class ClientRegistrationController {
 
     private final ClientRegistrationService clientRegistrationService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create client registration")
     void createClientRegistration(
@@ -35,6 +36,7 @@ public class ClientRegistrationController {
 
     @DeleteMapping("{clientId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     @Operation(summary = "Delete client registration by id")
     void deleteClientRegistration(
             @PathVariable String clientId
@@ -43,6 +45,7 @@ public class ClientRegistrationController {
     }
 
     @PutMapping("{clientId}")
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     @Operation(summary = "Update client registration")
     void updateClientRegistration(
             @RequestBody @Validated ClientRegistrationRequest clientRegistrationRequest
@@ -52,11 +55,20 @@ public class ClientRegistrationController {
 
     @GetMapping("{clientId}")
     @Operation(summary = "Get client registration by id")
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     ClientRegistration getClientRegistration(
             @PathVariable String clientId
     ) {
         return clientRegistrationService.findByRegistrationId(clientId);
     }
+
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
+    @GetMapping("admin")
+    @Operation(summary = "Get all client registrations for admin")
+    Collection<ClientRegistration> findAllForAdmin(){
+        return clientRegistrationService.findAllForAdmin();
+    }
+
 
     @GetMapping
     @Operation(summary = "Get all client registrations")
