@@ -7,6 +7,7 @@ import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.exception.FileProcessException;
 import danekerscode.keremetchat.repository.FileEntityRepository;
 import danekerscode.keremetchat.service.FileStorageService;
+import danekerscode.keremetchat.utils.FileUtils;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             var inputStream = new ByteArrayInputStream(file.getBytes());
 
-            var minioObjectPath = getMinioObjectPath(AppConstants.MINIO_DEFAULT_BUCKET.name(), file, source, target);
+            var minioObjectPath = FileUtils.getMinioObjectPath(AppConstants.MINIO_DEFAULT_BUCKET.name(), file, source, target);
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .stream(inputStream, inputStream.available(), -1)
@@ -41,7 +42,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             fileEntity.setFileName(file.getName());
             fileEntity.setSource(source);
             fileEntity.setSize(file.getBytes().length);
-            fileEntity.setExtension(getFileExtension(file));
+            fileEntity.setExtension(FileUtils.getFileExtension(file));
             fileEntity.setTarget(target);
             fileEntity.setPath(minioObjectPath);
 
@@ -66,26 +67,5 @@ public class FileStorageServiceImpl implements FileStorageService {
     public FileEntity findById(Long fileEntityId) {
         return fileEntityRepository.findByID(fileEntityId);
     }
-
-    private String getMinioObjectPath(
-            String bucketName,
-            MultipartFile file,
-            FileEntitySource source,
-            String target
-    ) {
-        return bucketName
-                .concat("/")
-                .concat(source.getPath())
-                .concat("/")
-                .concat(target)
-                .concat(file.getName());
-    }
-
-    private String getFileExtension(MultipartFile file) {
-        var dotIndex = file.getName().lastIndexOf(AppConstants.DOT.getValue());
-
-        return dotIndex == -1 ? "" : file.getName().substring(dotIndex);
-    }
-
 
 }
