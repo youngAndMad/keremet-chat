@@ -2,12 +2,14 @@ package danekerscode.keremetchat.repository;
 
 import danekerscode.keremetchat.model.entity.ChatMember;
 import danekerscode.keremetchat.repository.common.CommonRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChatMemberRepository extends CommonRepository<ChatMember, Long> {
-    @Override
-    default Class<ChatMember> getEntityClass() {
-        return ChatMember.class;
-    }
+
+    @Query(nativeQuery = true,value = """
+                select id from chat_member where chat_id=?1 and user_id=?2
+            """)
+    Long findByChatIdAndUserId(Long chatId, Long userId);
 }

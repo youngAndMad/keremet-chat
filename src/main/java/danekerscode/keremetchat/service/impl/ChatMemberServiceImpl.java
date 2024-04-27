@@ -9,6 +9,8 @@ import danekerscode.keremetchat.service.ChatMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ChatMemberServiceImpl implements ChatMemberService {
@@ -22,6 +24,11 @@ public class ChatMemberServiceImpl implements ChatMemberService {
         chatMember.setRole(chatUserRole);
         chatMember.setChat(chat);
         return chatMemberRepository.save(chatMember);
+    }
+
+    @Override
+    public Optional<Long> findByChatIdAndUserId(Long chatId, Long userId) {
+        return Optional.ofNullable(chatMemberRepository.findByChatIdAndUserId(chatId,userId));
     }
 
 }

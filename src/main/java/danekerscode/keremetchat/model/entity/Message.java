@@ -37,5 +37,10 @@ public class Message extends BaseEntity {
     private List<Message> children;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "message_files",
+            joinColumns = @JoinColumn(name = "message_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "file_entity_id" , referencedColumnName = "id")
+    )
     private List<FileEntity> files;
 }

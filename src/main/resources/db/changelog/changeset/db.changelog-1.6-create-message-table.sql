@@ -22,8 +22,8 @@ create table message
 create table message_files
 (
     message_id bigint not null ,
-    files_id   bigint not null unique,
+    file_entity_id   bigint not null unique,
     foreign key (message_id) references message (id),
-    foreign key (files_id) references file_entity (id)
+    foreign key (file_entity_id) references file_entity (id)
 );
 --rollback drop table message_files;
