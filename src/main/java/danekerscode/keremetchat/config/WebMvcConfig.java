@@ -1,8 +1,8 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.common.AppConstants;
-import danekerscode.keremetchat.common.LoggingInterceptor;
-import org.checkerframework.checker.units.qual.A;
+import danekerscode.keremetchat.common.interceptor.LoggingInterceptor;
+import danekerscode.keremetchat.config.properties.AppProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,19 +19,6 @@ import java.util.stream.Collectors;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Value("${cors.allowCredentials}")
-    private boolean allowCredentials;
-
-    @Value("${cors.allowedOrigins}")
-    private String[] allowedOrigins;
-
-    @Value("${cors.allowedMethods}")
-    private String[] allowedMethods;
-
-    @Value("${cors.allowedHeaders}")
-    private String[] allowedHeaders;
-
-
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(new LoggingInterceptor())
@@ -41,15 +28,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    CorsFilter corsFilter() {
+    CorsFilter corsFilter(AppProperties appProperties) {
+        var cors = appProperties.getCors();
+
         var corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(allowCredentials);
-        corsConfiguration.setAllowedOrigins(Arrays.stream(allowedOrigins).collect(Collectors.toList()));
-        corsConfiguration.setAllowedMethods(Arrays.stream(allowedMethods).collect(Collectors.toList()));
-        corsConfiguration.setAllowedHeaders(Arrays.stream(allowedHeaders).collect(Collectors.toList()));
+        corsConfiguration.setAllowCredentials(cors.getAllowCredentials());
+        corsConfiguration.setAllowedOrigins(cors.getAllowedOrigins());
+        corsConfiguration.setAllowedMethods(cors.getAllowedMethods());
+        corsConfiguration.setAllowedHeaders(cors.getAllowedHeaders());
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
+
         return new CorsFilter(source);
     }
 

@@ -63,6 +63,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/keremet_chat
 
 app:
+  cors:
+    allowCredentials: true
+    allowedOrigins: 'http://localhost:5173/'
+    allowedMethods: GET,POST,PUT,DELETE,OPTIONS,HEAD
+    allowedHeaders: origin,content-type,accept,authorization,cookie
   minio:
     url: http://localhost:9000
     access-key: minioadmin
@@ -78,13 +83,6 @@ app:
     default-admin:
       email: 'keremetchatadmin@gmail.com'
       password: 'keremetchatadmin'
-
-
-cors:
-  allowCredentials: true
-  allowedOrigins: 'http://localhost:5173/'
-  allowedMethods: GET,POST,PUT,DELETE,OPTIONS,HEAD
-  allowedHeaders: origin,content-type,accept,authorization,cookie
 
 springdoc:
   show-oauth2-endpoints: true

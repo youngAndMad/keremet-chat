@@ -1,5 +1,6 @@
-package danekerscode.keremetchat.common;
+package danekerscode.keremetchat.common.interceptor;
 
+import danekerscode.keremetchat.common.AppConstants;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
