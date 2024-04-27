@@ -1,8 +1,7 @@
 package danekerscode.keremetchat.security.oauth2;
 
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
-import danekerscode.keremetchat.utils.ClientRegistrationParametersMapper;
-import danekerscode.keremetchat.utils.ClientRegistrationRowMapper;
+import danekerscode.keremetchat.utils.JdbcUtils;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.ArgumentPreparedStatementSetter;
@@ -38,8 +37,10 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
              configuration_metadata = ? WHERE registration_id = ?
             """;
     private final JdbcOperations jdbcOperations;
-    private final Function<ClientRegistration, List<SqlParameterValue>> clientRegistrationListParametersMapper;
-    private final RowMapper<ClientRegistration> clientRegistrationRowMapper;
+    private final static Function<ClientRegistration, List<SqlParameterValue>> clientRegistrationListParametersMapper =
+            JdbcUtils::clientRegistrationToSqlParameterList;
+    private final static RowMapper<ClientRegistration> clientRegistrationRowMapper =
+            (rs, rowNum) -> JdbcUtils.mapToClientRegistration(rs);
 
 
     public JdbcClientRegistrationRepository(
@@ -48,22 +49,16 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
     ) {
         Assert.notNull(jdbcOperations, "JdbcOperations can not be null");
         this.jdbcOperations = jdbcOperations;
-        this.clientRegistrationRowMapper = new ClientRegistrationRowMapper();
-        this.clientRegistrationListParametersMapper = new ClientRegistrationParametersMapper();
 
         clientRegistrationMap.forEach((provider, clientRegistrations) ->
-            clientRegistrations.forEach(c -> this.persist(c,provider))
+                clientRegistrations.forEach(c -> this.persist(c, provider))
         );
     }
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         Assert.hasText(registrationId, "registrationId cannot be empty");
-        return this.findBy("registration_id = ?", registrationId);
-    }
-
-    private ClientRegistration findBy(String filter, Object... args) {
-        var result = this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_QUERY_SQL + filter, this.clientRegistrationRowMapper, args);
+        var result = this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_QUERY_SQL + "registration_id = ?", clientRegistrationRowMapper, registrationId);
         return !result.isEmpty() ? result.get(0) : null;
     }
 
@@ -93,7 +88,7 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
 
     public void updateRegisteredClient(ClientRegistration clientRegistration) {
         Assert.notNull(clientRegistration, "clientRegistration cannot be null");
-        var parameterValues = new ArrayList<>(this.clientRegistrationListParametersMapper.apply(clientRegistration));
+        var parameterValues = new ArrayList<>(clientRegistrationListParametersMapper.apply(clientRegistration));
         var id = parameterValues.remove(0);
         parameterValues.add(id);
         var statementSetter = new ArgumentPreparedStatementSetter(parameterValues.toArray());
@@ -104,7 +99,7 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
             ClientRegistration clientRegistration,
             CommonOAuth2Provider provider
     ) {
-        var parameterValues = this.clientRegistrationListParametersMapper.apply(clientRegistration);
+        var parameterValues = clientRegistrationListParametersMapper.apply(clientRegistration);
         parameterValues.add(new SqlParameterValue(12, provider.name()));
 
         var statementSetter = new ArgumentPreparedStatementSetter(parameterValues.toArray());
@@ -131,12 +126,12 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
     @Nonnull
     public Iterator<ClientRegistrationResponse> iterator() {
         return this.jdbcOperations
-                .query(LOAD_CLIENT_REGISTERED_SQL, this.clientRegistrationRowMapper).stream()
+                .query(LOAD_CLIENT_REGISTERED_SQL, clientRegistrationRowMapper).stream()
                 .map(c -> new ClientRegistrationResponse(this.getProviderName(c.getRegistrationId()), c.getRegistrationId()))
                 .iterator();
     }
 
     public Collection<ClientRegistration> findAll() {
-        return this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_SQL, this.clientRegistrationRowMapper);
+        return this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_SQL, clientRegistrationRowMapper);
     }
 }
