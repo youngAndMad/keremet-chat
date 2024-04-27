@@ -26,8 +26,6 @@ spring:
       hibernate:
         enable_lazy_load_no_trans: true
         format_sql: true
-  freemarker:
-    template-loader-path: classpath:/templates/email/
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -48,6 +46,7 @@ spring:
       client:
         registration:
           github:
+            common-provider-type: github
             provider: github
             client-name: GitHub
             client-id: ${GITHUB_CLIENT_ID}
@@ -57,11 +56,11 @@ spring:
               - read:user
         provider:
           github:
-            user-name-attribute: login
+            user-name-attribute: loginы
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5433/keremet_chat
+    url: jdbc:postgresql://localhost:5432/keremet_chat
 
 app:
   minio:
@@ -77,7 +76,7 @@ app:
     allowed-origins: 'http://localhost:5173/'
   security:
     default-admin:
-      email: 'kkraken2005@gmail.com'
+      email: 'keremetchatadmin@gmail.com'
       password: 'keremetchatadmin'
 
 

@@ -19,7 +19,8 @@ public class Chat extends BaseEntity {
     private ChatType type;
     private String name;
 
-    private String avatarUrl;
+    @OneToMany
+    private List<FileEntity> avatars;
 
     @OneToMany(mappedBy = "chat")
     private List<ChatMember> members;

@@ -17,6 +17,7 @@ CREATE TABLE oauth2_client_registration
     user_info_uri                   VARCHAR(1000),
     user_info_authentication_method VARCHAR(100),
     user_name_attribute_name        VARCHAR(100),
-    configuration_metadata          VARCHAR(2000)
+    configuration_metadata          VARCHAR(2000),
+    provider_name                   VARCHAR(100)
 );
 --rollback DROP TABLE oauth2_client_registration;

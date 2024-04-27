@@ -1,12 +1,14 @@
 package danekerscode.keremetchat.service;
 
-import danekerscode.keremetchat.model.entity.Chat;
-import danekerscode.keremetchat.model.entity.Message;
+import danekerscode.keremetchat.model.entity.FileEntity;
+import danekerscode.keremetchat.model.enums.FileEntitySource;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageService {
 
-    void save(MultipartFile file , Message message);
+    FileEntity save(MultipartFile file, FileEntitySource source, String target);
 
-    String save(MultipartFile file, Chat chat);
+    void deleteFile(Long fileId);
+
+    FileEntity findById(Long fileEntityId);
 }

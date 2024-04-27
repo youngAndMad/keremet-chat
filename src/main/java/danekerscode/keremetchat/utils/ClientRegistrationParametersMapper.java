@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public class ClientRegistrationParametersMapper implements Function<ClientRegistration, List<SqlParameterValue>> {
+public class ClientRegistrationParametersMapper
+        implements Function<ClientRegistration, List<SqlParameterValue>> {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final int STRING_SQL_TYPE = 12;
 

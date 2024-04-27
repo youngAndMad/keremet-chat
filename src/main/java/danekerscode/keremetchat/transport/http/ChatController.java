@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,15 +28,7 @@ public class ChatController {
     @FetchUserContext
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create a private chat", responses = {
-            @ApiResponse(responseCode = "201", description = "Chat created",
-                    content = @Content(
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Create chat response",
-                                            value = "{\"id\": 1}",
-                                            description = "id: identifier of created chat")
-                            })
-            )
+            @ApiResponse(responseCode = "201", description = "Chat created. Will return id of created chat")
     })
     IdDto<Long> createChat(
             @RequestBody @Validated CreatePrivateChatRequest createChatRequest
@@ -54,4 +47,21 @@ public class ChatController {
     ) {
         chatService.deletePrivateChat(chatId);
     }
+
+    @PostMapping("{id}/avatar")
+    void uploadAvatar(
+            @PathVariable Long id,
+            @RequestParam MultipartFile file
+    ) {
+        this.chatService.uploadAvatar(file, id);
+    }
+
+    @DeleteMapping("{id}/avatar/{fileId}")
+    void uploadAvatar(
+            @PathVariable Long id,
+            @PathVariable Long fileId
+    ) {
+        this.chatService.deleteAvatar(fileId, id);
+    }
+
 }

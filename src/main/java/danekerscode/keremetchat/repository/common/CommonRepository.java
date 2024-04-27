@@ -40,6 +40,12 @@ public interface CommonRepository<Entity, Pk extends Serializable> extends JpaRe
         return existsById(id);
     }
 
+    default void checkExists(@NonNull Pk id){
+        if(!existsById(id)){
+            throw new EntityNotFoundException(getEntityClass(), id.toString());
+        }
+    }
+
 
     /**
      * Finds an entity by its id and throws an exception if not found or deleted is true.

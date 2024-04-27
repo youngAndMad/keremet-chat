@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AppConstants {
 
+    DOT("."),
     EMPTY_STRING(""),
     MINIO_DEFAULT_BUCKET("keremet-chat"),
 

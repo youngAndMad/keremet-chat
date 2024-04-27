@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
+import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,7 +60,7 @@ public class ClientRegistrationController {
 
     @GetMapping
     @Operation(summary = "Get all client registrations")
-    Iterator<ClientRegistration> getAllClientRegistrations() {
+    Iterator<ClientRegistrationResponse> getAllClientRegistrations() {
         return clientRegistrationService.findAll();
     }
 }

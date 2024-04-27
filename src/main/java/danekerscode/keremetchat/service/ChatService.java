@@ -2,6 +2,7 @@ package danekerscode.keremetchat.service;
 
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,4 +15,8 @@ public interface ChatService {
     List<Long> getMemberUsersIdList(Long chatId);
 
     boolean existsById(Long chatId);
+
+    void uploadAvatar(MultipartFile file, Long chatId);
+
+    void deleteAvatar(Long fileId, Long chatId);
 }

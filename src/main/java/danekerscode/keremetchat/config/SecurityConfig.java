@@ -4,11 +4,13 @@ import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,15 +21,22 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +45,10 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
         jsr250Enabled = true,
         securedEnabled = true
 )
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final Environment env;
 
     private static final String[] publicEndpoints = {
             "/error",
@@ -64,8 +76,11 @@ public class SecurityConfig {
             JdbcOperations jdbcOperations,
             OAuth2ClientProperties oAuth2ClientProperties
     ) {
-        var oAuth2ClientPropertiesMapper = new OAuth2ClientPropertiesMapper(oAuth2ClientProperties);
-        return new JdbcClientRegistrationRepository(jdbcOperations, oAuth2ClientPropertiesMapper.asClientRegistrations().values());
+        var propertiesMapper = new OAuth2ClientPropertiesMapper(oAuth2ClientProperties);
+        var clientRegistrations = propertiesMapper.asClientRegistrations().values();
+        var clientRegistrationMap = clientRegistrations.stream()
+                .collect(Collectors.groupingBy(c -> this.getProviderNameByRegistrationId(c.getRegistrationId())));
+        return new JdbcClientRegistrationRepository(jdbcOperations, clientRegistrationMap);
     }
 
     @Bean
@@ -129,6 +144,16 @@ public class SecurityConfig {
     @Bean
     SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
+    }
+
+    private CommonOAuth2Provider getProviderNameByRegistrationId(String registrationId){
+        var provider = env.getProperty("spring.security.oauth2.client.registration." + registrationId + ".common-provider-type", CommonOAuth2Provider.class);
+
+        if(provider == null){
+            throw new IllegalArgumentException("Unknown provider: " + registrationId);
+        }
+
+        return provider;
     }
 }
 

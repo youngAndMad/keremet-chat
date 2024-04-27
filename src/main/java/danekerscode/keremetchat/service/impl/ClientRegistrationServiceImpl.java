@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
+import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.security.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.service.ClientRegistrationService;
@@ -19,22 +20,14 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     private final JdbcClientRegistrationRepository clientRegistrationRepository;
 
     @Override
-    public boolean save(ClientRegistrationRequest clientRegistrationRequest) {
+    public void save(ClientRegistrationRequest clientRegistrationRequest) {
         var clientRegistration = clientRegistrationRequest.provider()
                 .getBuilder(clientRegistrationRequest.registrationId())
                 .clientId(clientRegistrationRequest.clientId())
                 .clientSecret(clientRegistrationRequest.clientSecret())
                 .build();
 
-        var alreadyExists = clientRegistrationRepository.persist(clientRegistration);
-
-        log.info(
-                "Client registration {} for client {}",
-                alreadyExists ? "updated" : "created",
-                clientRegistration.getClientName()
-        );
-
-        return alreadyExists;
+      clientRegistrationRepository.insertClientRegistration(clientRegistration, clientRegistrationRequest.provider());
     }
 
     @Override
@@ -43,7 +36,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     }
 
     @Override
-    public Iterator<ClientRegistration> findAll() {
+    public Iterator<ClientRegistrationResponse> findAll() {
         return clientRegistrationRepository.iterator();
     }
 
@@ -55,7 +48,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
             throw new EntityNotFoundException(ClientRegistration.class, clientRegistrationRequest.registrationId());
         }
 
-        clientRegistrationRepository.persist(clientRegistration);
+        clientRegistrationRepository.updateRegisteredClient(clientRegistration);
     }
 
     @Override
