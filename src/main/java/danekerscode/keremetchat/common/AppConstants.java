@@ -7,6 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AppConstants {
 
+    REQUEST_START_TIME("request_start_time"),
+
+    LOGGING_PATH_PATTERN("/api/**"),
+
     DOT("."),
     EMPTY_STRING(""),
     MINIO_DEFAULT_BUCKET("keremet-chat"),
