@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.transport.websocket;
 
 import danekerscode.keremetchat.model.dto.request.websocket.MessageRequest;
-import danekerscode.keremetchat.service.ChatMemberService;
 import danekerscode.keremetchat.service.MessageService;
 import danekerscode.keremetchat.service.UserNotificationService;
 import danekerscode.keremetchat.service.UserStatusService;
@@ -13,8 +12,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -36,10 +33,13 @@ public final class MessageController extends AbstractWebSocketController {
 
         var chatMembers = super.findChatMemberUsersId(chatId);
 
-        chatMembers.stream().map(userStatusService::getUserActivity)
+        chatMembers.stream()
+                .map(userStatusService::getUserActivity)
                 .forEach(userActivity -> {
-                    if (!userActivity.isOnline()){
-
+                    if (!userActivity.isOnline()) {
+                        // todo send real time message with web socket
+                    } else {
+//                        userNotificationService.save() todo save notification for user
                     }
                 });
     }

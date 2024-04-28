@@ -44,14 +44,4 @@ public class LoggingInterceptor implements HandlerInterceptor {
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
     }
 
-    @Override
-    public void afterCompletion(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull Object handler,
-            Exception ex
-    ) throws Exception {
-        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-    }
-
 }

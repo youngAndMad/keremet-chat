@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("register/manager")
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     @Operation(description = "Register a new application manager", responses = {
             @ApiResponse(responseCode = "201", description = "Manager registered")
     })

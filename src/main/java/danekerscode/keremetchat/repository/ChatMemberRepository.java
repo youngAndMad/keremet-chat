@@ -10,11 +10,14 @@ import java.util.List;
 @Repository
 public interface ChatMemberRepository extends CommonRepository<ChatMember, Long> {
 
-    @Query(nativeQuery = true,value = """
+    @Query(nativeQuery = true, value = """
                 select id from chat_member where chat_id=?1 and user_id=?2
             """)
     Long findByChatIdAndUserId(Long chatId, Long userId);
 
-    @Query("select ChatMember.user.id from ChatMember c where c.chat.id = ?1")
+    @Query(nativeQuery = true, value = """
+            select cm.user_id from chat_member cm where chat_id = ?1
+            """)
     List<Long> findChatMemberUsersId(Long chatId);
+
 }

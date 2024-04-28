@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.context.holder.UserContextHolder;
-import danekerscode.keremetchat.core.annotation.AvailableForRootOrOwner;
 import danekerscode.keremetchat.core.annotation.FetchUserContext;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.model.dto.request.UsersCriteria;
@@ -21,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -53,8 +51,7 @@ public class UserController {
     }
 
     @Operation(summary = "Deactivate user by id")
-    @FetchUserContext
-    @AvailableForRootOrOwner
+    @FetchUserContext(checkPersonalAccess = true)
     @PatchMapping("{userId}/deactivate")
     void deactivateUser(@PathVariable Long userId) {
         userService.deactivateUser(userId, UserContextHolder.getContext());
@@ -68,7 +65,7 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "0") @Positive int page,
             @RequestParam(required = false, defaultValue = "5") @Min(5) @Max(100) int pageSize
     ) {
-        return userService.filterUsers(criteria,PageRequest.of(page,pageSize));
+        return userService.filterUsers(criteria, PageRequest.of(page, pageSize));
     }
 
 }

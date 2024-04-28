@@ -2,6 +2,7 @@ package danekerscode.keremetchat.core.helper;
 
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
+import danekerscode.keremetchat.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,10 +42,10 @@ public class UserContextHelper {
             return userRepository.findByUsername( username).orElseThrow(() -> new RuntimeException("User not found"));
         }
 
-        if (currentAuthPrincipal instanceof  org.springframework.security.core.userdetails.User user) {
-            var email = user.getUsername();
-            return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        if (currentAuthPrincipal instanceof CustomUserDetails customUserDetails) {
+            return customUserDetails.user();
         }
+
 
         throw new RuntimeException("Not supported authentication type for user extraction %s".formatted(currentAuthPrincipal.getClass().getName()));
     }
