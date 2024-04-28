@@ -9,6 +9,7 @@ import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
+import danekerscode.keremetchat.security.CustomUserDetails;
 import danekerscode.keremetchat.service.AuthService;
 import danekerscode.keremetchat.service.AuthTypeService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public User login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.email(), loginRequest.password()
         );
@@ -64,6 +65,10 @@ public class AuthServiceImpl implements AuthService {
         var securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         securityContextRepository.saveContext(securityContext, request, response);
+
+        var currentUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        return currentUserDetails.user();
     }
 
     @Override

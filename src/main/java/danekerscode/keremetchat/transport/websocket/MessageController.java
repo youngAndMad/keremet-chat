@@ -1,28 +1,47 @@
 package danekerscode.keremetchat.transport.websocket;
 
+import danekerscode.keremetchat.model.dto.request.websocket.MessageRequest;
+import danekerscode.keremetchat.service.ChatMemberService;
 import danekerscode.keremetchat.service.MessageService;
+import danekerscode.keremetchat.service.UserNotificationService;
+import danekerscode.keremetchat.service.UserStatusService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.annotation.Validated;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/message/{chatId}")
 public final class MessageController extends AbstractWebSocketController {
 
     private final MessageService messageService;
+    private final UserStatusService userStatusService;
+    private final UserNotificationService userNotificationService;
 
-    @MessageMapping
+    @MessageMapping("/message/{chatId}")
     void sendMessage(
             @DestinationVariable @Positive Long chatId,
-            Authentication auth
+            Authentication auth,
+            @Validated @Payload MessageRequest messageRequest
     ) {
         var user = super.getUserFromAuthentication(auth);
 
+        messageService.saveMessage(user, chatId, messageRequest);
+
+        var chatMembers = super.findChatMemberUsersId(chatId);
+
+        chatMembers.stream().map(userStatusService::getUserActivity)
+                .forEach(userActivity -> {
+                    if (!userActivity.isOnline()){
+
+                    }
+                });
     }
 
 }

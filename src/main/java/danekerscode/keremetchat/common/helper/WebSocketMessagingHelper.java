@@ -8,7 +8,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -23,20 +22,14 @@ public class WebSocketMessagingHelper {
             Long destinationIdentifier
     ) {
         try {
-
-            if (!webSocketDestination.getDestinationType().isWithIdentifier()) {
-                simpMessagingTemplate.convertAndSend(webSocketDestination.getDestination(), data);
-            } else {
-                var destination = webSocketDestination.getDestination();
-                var finalDestination = destination.replace(Objects.requireNonNull(webSocketDestination.getIdentifier()), destinationIdentifier.toString());
-                simpMessagingTemplate.convertAndSend(finalDestination, data);
-            }
+            simpMessagingTemplate.convertAndSend(webSocketDestination.getDestination(), data);
 
             log.info(
                     "successfully delivered websocket message to {} with destination {}",
                     destinationIdentifier,
                     webSocketDestination.getDestination()
             );
+
         } catch (MessagingException messagingException) {
             log.error("error during message delivering to {} ",
                     String.format("destinationIdentifier %d, destination %s", destinationIdentifier, webSocketDestination.getDestination()),
@@ -51,6 +44,6 @@ public class WebSocketMessagingHelper {
             Long... destinationIdentifiers
     ) {
         Arrays.stream(destinationIdentifiers)
-                .forEach(destinationIdentifier -> this.deliver(data, webSocketDestination,destinationIdentifier));
+                .forEach(destinationIdentifier -> this.deliver(data, webSocketDestination, destinationIdentifier));
     }
 }

@@ -38,17 +38,17 @@ public class MessageServiceImpl implements MessageService {
             throw new EntityNotFoundException(Chat.class, chatId);
         }
 
-        var chatMemberId = chatMemberService.findByChatIdAndUserId(chatId, currentUser.getId())
+        var chatMemberId = chatMemberService
+                .findByChatIdAndUserId(chatId, currentUser.getId())
                 .orElseThrow(() -> new InvalidRequestPayloadException("User is not a member of the chat"));
 
         var messageId = messageRepository.insertMessage(messageRequest.content(), chatId, chatMemberId, messageRequest.parentId());
 
-        if (CollectionUtils.isEmpty(messageRequest.files())) {
-            return;
+        if (!CollectionUtils.isEmpty(messageRequest.files())) {
+            messageRequest.files().stream()
+                    .map(file -> fileStorageService.save(file, FileEntitySource.MESSAGE_CONTENT, String.valueOf(messageId)))
+                    .forEach(fileEntity -> messageRepository.insertMessageFile(messageId, fileEntity.getId()));
         }
 
-        messageRequest.files().stream()
-                .map(file -> fileStorageService.save(file, FileEntitySource.MESSAGE_CONTENT, String.valueOf(messageId)))
-                .forEach(fileEntity -> messageRepository.insertMessageFile(messageId, fileEntity.getId()));
     }
 }

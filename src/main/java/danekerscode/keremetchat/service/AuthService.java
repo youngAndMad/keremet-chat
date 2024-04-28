@@ -11,7 +11,7 @@ public interface AuthService {
 
     User register(RegistrationRequest request);
 
-    void login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
+    User login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response);
 
     void resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

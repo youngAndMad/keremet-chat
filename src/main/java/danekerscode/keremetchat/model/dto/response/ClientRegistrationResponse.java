@@ -7,5 +7,4 @@ public record ClientRegistrationResponse(
         CommonOAuth2Provider provider,
         String registrationId
 ) {
-
 }

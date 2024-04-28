@@ -50,12 +50,12 @@ public class AuthController {
     @Operation(description = "Login", responses = {
             @ApiResponse(responseCode = "200", description = "Login successful")
     })
-    void login(
+    User login(
             @RequestBody @Validated LoginRequest loginRequest,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        authService.login(loginRequest, request, response);
+        return authService.login(loginRequest, request, response);
     }
 
     @PostMapping("reset-password")

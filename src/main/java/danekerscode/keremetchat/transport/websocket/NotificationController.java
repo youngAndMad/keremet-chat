@@ -1,21 +1,25 @@
 package danekerscode.keremetchat.transport.websocket;
 
-import danekerscode.keremetchat.model.dto.request.websocket.DeliverNotificationRequest;
+import danekerscode.keremetchat.model.UserActivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 
 @Controller
 @RequiredArgsConstructor
-public final class NotificationController extends AbstractWebSocketController{
-
+public final class NotificationController extends AbstractWebSocketController {
 
     @MessageMapping("/notification/send")
     void deliverNotification(
-            @Payload @Validated DeliverNotificationRequest notificationRequest
+            Authentication auth
     ) {
+        var currentUser = super.getUserFromAuthentication(auth);
 
+//        var chatMembers = super.findChatMemberUsersId(chatId); todo
+//
+//        chatMembers.stream().map(super::getUserActivity)
+//                .filter(UserActivity::isOnline)
+//                .forEach();
     }
 }
