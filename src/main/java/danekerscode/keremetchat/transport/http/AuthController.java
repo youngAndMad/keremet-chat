@@ -5,6 +5,7 @@ import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
+import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,8 +31,19 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User registered")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    User register(@RequestBody RegistrationRequest request) {
+    UserResponseDto register(@RequestBody RegistrationRequest request) {
         return authService.register(request);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("register/manager")
+    @Operation(description = "Register a new application manager", responses = {
+            @ApiResponse(responseCode = "201", description = "Manager registered")
+    })
+    UserResponseDto registerManager(
+            @RequestBody RegistrationRequest request
+    ){
+        return authService.registerManager(request);
     }
 
     @GetMapping("me")
@@ -39,15 +51,15 @@ public class AuthController {
     @Operation(description = "Get current user", responses = {
             @ApiResponse(responseCode = "200", description = "Current user")
     })
-    User me() {
-        return UserContextHolder.getContext();
+    UserResponseDto me() {
+        return authService.getCurrentUser();
     }
 
     @PostMapping("login")
     @Operation(description = "Login", responses = {
             @ApiResponse(responseCode = "200", description = "Login successful")
     })
-    User login(
+    UserResponseDto login(
             @RequestBody @Validated LoginRequest loginRequest,
             HttpServletRequest request,
             HttpServletResponse response

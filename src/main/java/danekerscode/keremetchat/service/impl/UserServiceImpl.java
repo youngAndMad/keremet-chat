@@ -54,7 +54,8 @@ public class UserServiceImpl implements UserService {
             return;
         }
 
-        var securityRoles = Arrays.stream(SecurityRoleType.values()).map(securityRoleService::findByType)
+        var securityRoles = Arrays.stream(SecurityRoleType.values())
+                .map(securityRoleService::findByType)
                 .collect(Collectors.toSet());
 
         var user = new User();

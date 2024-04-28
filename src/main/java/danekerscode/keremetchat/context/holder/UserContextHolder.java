@@ -23,4 +23,8 @@ public class UserContextHolder {
     public static boolean isEmpty() {
         return userContext.get() == null;
     }
+
+    public static boolean isExists(){
+        return !isEmpty();
+    }
 }
