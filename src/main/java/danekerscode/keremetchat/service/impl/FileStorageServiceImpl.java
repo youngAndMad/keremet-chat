@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.entity.FileEntity;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;

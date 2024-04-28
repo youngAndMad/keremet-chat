@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.model.dto.request;
 
-import danekerscode.keremetchat.common.annotation.Password;
+import danekerscode.keremetchat.core.annotation.Password;
 
 public record ResetPasswordRequest(
         @Password

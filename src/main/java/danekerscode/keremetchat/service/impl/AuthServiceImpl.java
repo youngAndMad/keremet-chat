@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.common.AppConstants;
-import danekerscode.keremetchat.common.mapper.UserMapper;
+import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.mapper.UserMapper;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;

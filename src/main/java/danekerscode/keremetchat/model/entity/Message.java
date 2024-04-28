@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.model.entity;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

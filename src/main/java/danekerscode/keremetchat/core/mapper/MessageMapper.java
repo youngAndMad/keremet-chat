@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.common.mapper;
+package danekerscode.keremetchat.core.mapper;
 
 import org.mapstruct.Mapper;
 

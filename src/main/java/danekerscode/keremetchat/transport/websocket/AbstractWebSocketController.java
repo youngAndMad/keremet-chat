@@ -1,8 +1,8 @@
 package danekerscode.keremetchat.transport.websocket;
 
 
-import danekerscode.keremetchat.common.helper.UserContextHelper;
-import danekerscode.keremetchat.common.helper.WebSocketMessagingHelper;
+import danekerscode.keremetchat.core.helper.UserContextHelper;
+import danekerscode.keremetchat.core.helper.WebSocketMessagingHelper;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;

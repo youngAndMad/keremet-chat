@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.common.helper;
+package danekerscode.keremetchat.core.helper;
 
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;

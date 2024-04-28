@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.utils;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;

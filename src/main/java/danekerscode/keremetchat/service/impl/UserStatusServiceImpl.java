@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.service.UserStatusService;
 import lombok.RequiredArgsConstructor;

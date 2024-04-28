@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.common;
+package danekerscode.keremetchat.core;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

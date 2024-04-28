@@ -1,6 +1,6 @@
-package danekerscode.keremetchat.common.aspect;
+package danekerscode.keremetchat.core.aspect;
 
-import danekerscode.keremetchat.common.annotation.AvailableForRootOrOwner;
+import danekerscode.keremetchat.core.annotation.AvailableForRootOrOwner;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import lombok.extern.slf4j.Slf4j;

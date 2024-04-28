@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.common.helper;
+package danekerscode.keremetchat.core.helper;
 
 import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;
 import lombok.RequiredArgsConstructor;

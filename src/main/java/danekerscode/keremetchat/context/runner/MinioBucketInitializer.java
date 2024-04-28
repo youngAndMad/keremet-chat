@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.context.runner;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;

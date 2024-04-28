@@ -1,9 +1,8 @@
 package danekerscode.keremetchat.config;
 
-import danekerscode.keremetchat.common.AppConstants;
-import danekerscode.keremetchat.common.interceptor.LoggingInterceptor;
+import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.interceptor.LoggingInterceptor;
 import danekerscode.keremetchat.config.properties.AppProperties;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -12,9 +11,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

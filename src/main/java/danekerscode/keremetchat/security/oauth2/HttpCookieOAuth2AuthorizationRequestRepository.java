@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 
-import  danekerscode.keremetchat.common.AppConstants;
+import  danekerscode.keremetchat.core.AppConstants;
 
 @Component
 public class HttpCookieOAuth2AuthorizationRequestRepository

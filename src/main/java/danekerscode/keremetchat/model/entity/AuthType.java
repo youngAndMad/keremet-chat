@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Entity
 @Getter
@@ -14,6 +15,7 @@ import lombok.Setter;
 @JsonIgnoreProperties({
         "id" , "createdDate" , "lastModifiedDate"
 })
+@FieldNameConstants
 public class AuthType extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

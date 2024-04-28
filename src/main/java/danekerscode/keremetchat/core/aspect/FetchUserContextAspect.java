@@ -1,6 +1,6 @@
-package danekerscode.keremetchat.common.aspect;
+package danekerscode.keremetchat.core.aspect;
 
-import danekerscode.keremetchat.common.helper.UserContextHelper;
+import danekerscode.keremetchat.core.helper.UserContextHelper;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class FetchUserContextAspect {
 
     private final UserContextHelper userContextHelper;
 
-    @Before("@annotation(danekerscode.keremetchat.common.annotation.FetchUserContext)")
+    @Before("@annotation(danekerscode.keremetchat.core.annotation.FetchUserContext)")
     public void beforeFetchUserContext() {
         var currentAuth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -35,7 +35,7 @@ public class FetchUserContextAspect {
         UserContextHolder.setContext(user);
     }
 
-    @After("@annotation(danekerscode.keremetchat.common.annotation.FetchUserContext)")
+    @After("@annotation(danekerscode.keremetchat.core.annotation.FetchUserContext)")
     public void afterFetchUserContext() {
         UserContextHolder.clear();
     }

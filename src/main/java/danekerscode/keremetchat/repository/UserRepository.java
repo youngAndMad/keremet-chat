@@ -2,6 +2,7 @@ package danekerscode.keremetchat.repository;
 
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.common.CommonRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,7 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CommonRepository<User, Long> {
+public interface UserRepository extends CommonRepository<User, Long>,
+        JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmail(String email);
 

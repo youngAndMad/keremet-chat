@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.dto.request.websocket.DeliverNotificationRequest;
 import danekerscode.keremetchat.model.entity.UserNotification;
 import danekerscode.keremetchat.service.UserNotificationService;

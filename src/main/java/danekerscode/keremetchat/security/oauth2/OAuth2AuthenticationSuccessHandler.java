@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.security.oauth2;
 
-import danekerscode.keremetchat.common.AppConstants;
+import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.service.AuthTypeService;

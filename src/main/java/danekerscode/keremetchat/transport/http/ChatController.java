@@ -1,13 +1,10 @@
 package danekerscode.keremetchat.transport.http;
 
-import danekerscode.keremetchat.common.annotation.FetchUserContext;
+import danekerscode.keremetchat.core.annotation.FetchUserContext;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
 import danekerscode.keremetchat.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

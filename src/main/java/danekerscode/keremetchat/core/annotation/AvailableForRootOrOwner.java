@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.common.annotation;
+package danekerscode.keremetchat.core.annotation;
 
 import java.lang.annotation.*;
 
