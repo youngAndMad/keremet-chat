@@ -10,6 +10,6 @@ CREATE TABLE file_entity
     source             varchar,
     extension          varchar,
     size               bigint not null ,
-    path               varchar(255)
+    path               varchar unique not null
 );
 --rollback drop table file_entity;

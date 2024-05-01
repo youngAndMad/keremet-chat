@@ -65,7 +65,7 @@ spring:
 app:
   cors:
     allowCredentials: true
-    allowedOrigins: 'http://localhost:5173/'
+    allowedOrigins: http://localhost:5173/,http://localhost:4200/
     allowedMethods: GET,POST,PUT,DELETE,OPTIONS,HEAD
     allowedHeaders: origin,content-type,accept,authorization,cookie
   minio:

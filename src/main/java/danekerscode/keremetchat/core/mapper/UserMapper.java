@@ -23,7 +23,8 @@ public interface UserMapper {
     default Set<SecurityRoleType> extractRoleTypes(User user){
         var finalRoles = user.getRoles() == null ? new HashSet<SecurityRole>() : user.getRoles();
 
-        return finalRoles.stream().map(SecurityRole::getType)
+        return finalRoles.stream()
+                .map(SecurityRole::getType)
                 .collect(Collectors.toSet());
     }
 }

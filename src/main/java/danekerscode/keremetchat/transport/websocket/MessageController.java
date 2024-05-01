@@ -1,6 +1,9 @@
 package danekerscode.keremetchat.transport.websocket;
 
 import danekerscode.keremetchat.model.dto.request.websocket.MessageRequest;
+import danekerscode.keremetchat.model.entity.UserNotification;
+import danekerscode.keremetchat.model.enums.websocket.WebsocketNotificationType;
+import danekerscode.keremetchat.model.notification.MessageNotification;
 import danekerscode.keremetchat.service.MessageService;
 import danekerscode.keremetchat.service.UserNotificationService;
 import danekerscode.keremetchat.service.UserStatusService;
@@ -37,6 +40,11 @@ public final class MessageController extends AbstractWebSocketController {
                 .map(userStatusService::getUserActivity)
                 .forEach(userActivity -> {
                     if (!userActivity.isOnline()) {
+                        var notification = new UserNotification<MessageNotification>();
+                        notification.setType(WebsocketNotificationType.MESSAGE);
+                        notification.setUserId(userActivity.getUserId());
+
+//                        var notificationContent =
                         // todo send real time message with web socket
                     } else {
 //                        userNotificationService.save() todo save notification for user

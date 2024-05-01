@@ -19,5 +19,6 @@ public class FileEntity extends BaseEntity{
     private FileEntitySource source;
     private String extension;
     private long size;
+    @Column(unique = true)
     private String path; // path in minio 
 }

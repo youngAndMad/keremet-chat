@@ -5,6 +5,7 @@ import danekerscode.keremetchat.context.holder.UserContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,7 +35,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
         var totalExecution = System.currentTimeMillis() - (long) request.getAttribute(AppConstants.REQUEST_START_TIME.getValue());
 
-        log.info("Completed api request {}, method ={}, response status = {}, execution = {}ms, user={}" ,
+        log.info("Completed api request {}, method = {}, response status = {}, execution = {}ms, user={}" ,
                 request.getRequestURI(),
                 request.getMethod(),
                 response.getStatus(),

@@ -1,6 +1,8 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.model.dto.KeyPair;
+import danekerscode.keremetchat.model.dto.response.DownloadFileResponse;
 import danekerscode.keremetchat.model.entity.FileEntity;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
@@ -8,19 +10,27 @@ import danekerscode.keremetchat.model.exception.FileProcessException;
 import danekerscode.keremetchat.repository.FileEntityRepository;
 import danekerscode.keremetchat.service.FileStorageService;
 import danekerscode.keremetchat.utils.FileUtils;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
-
     private final FileEntityRepository fileEntityRepository;
     private final MinioClient minioClient;
 
@@ -86,6 +96,46 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public FileEntity findById(Long fileEntityId) {
         return fileEntityRepository.findByID(fileEntityId);
+    }
+
+    @Override
+    public CompletableFuture<DownloadFileResponse> downloadFile(
+            Long fileEntityId
+    ) {
+        var fileEntity = fileEntityRepository.findByID(fileEntityId);
+        var minioObjectPath = fileEntity.getPath();
+
+        return this.downloadFileByPath(minioObjectPath)
+                .thenApply((inputStreamResource -> new DownloadFileResponse(fileEntity, inputStreamResource)));
+    }
+
+    @Override
+    public CompletableFuture<DownloadFileResponse> downloadFileWithPath(String objectPath) {
+        var fileEntity = fileEntityRepository.findByPath(objectPath)
+                .orElseThrow(() -> new EntityNotFoundException(FileEntity.class, new KeyPair<>("path", objectPath)));
+
+        return this.downloadFileByPath(fileEntity.getPath())
+                .thenApply((inputStreamResource -> new DownloadFileResponse(fileEntity, inputStreamResource)));
+    }
+
+    private CompletableFuture<InputStreamResource> downloadFileByPath(
+            String objectPath
+    ) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                var response = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
+                                .object(objectPath)
+                                .build()
+                );
+                return new InputStreamResource(response);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).exceptionally(th -> {
+            throw new FileProcessException(th);
+        });
     }
 
 }

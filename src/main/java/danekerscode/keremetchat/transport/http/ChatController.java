@@ -46,6 +46,7 @@ public class ChatController {
     }
 
     @PostMapping("{id}/avatar")
+    @Operation(description = "Upload avatar for chat")
     void uploadAvatar(
             @PathVariable Long id,
             @RequestParam MultipartFile file
