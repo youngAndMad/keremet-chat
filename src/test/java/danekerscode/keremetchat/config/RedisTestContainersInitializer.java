@@ -4,27 +4,24 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-public class TestContainersInitializer implements
+public class RedisTestContainersInitializer implements
         ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.1"));
+    private static final String REDIS_IMAGE_NAME = "postgres:15.1";
+
     static GenericContainer<?> redis =
-            new GenericContainer<>(DockerImageName.parse("redis:latest")).withExposedPorts(6379);
+            new GenericContainer<>(DockerImageName.parse(REDIS_IMAGE_NAME)).withExposedPorts(6379);
 
     static {
-        Startables.deepStart(postgres, redis).join();
+        Startables.deepStart(redis).join();
     }
 
     @Override
     public void initialize(ConfigurableApplicationContext ctx) {
         TestPropertyValues.of(
-                "spring.datasource.url=" + postgres.getJdbcUrl(),
-                "spring.datasource.username=" + postgres.getUsername(),
-                "spring.datasource.password=" + postgres.getPassword(),
                 "spring.redis.host=" + redis.getHost(),
                 "spring.redis.port=" + redis.getMappedPort(6379).toString()
         ).applyTo(ctx.getEnvironment());

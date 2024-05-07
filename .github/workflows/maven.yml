@@ -1,4 +1,4 @@
-name: Java CI with Maven
+name: Java CI with Gradle
 
 on:
   push:
@@ -16,6 +16,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
-      - name: Run tests with Maven
-        run: mvn clean test
+          cache: gradle
+      - name: Run tests with Gradle
+        run: |
+          ./gradlew clean test
