@@ -36,8 +36,6 @@ build/
 ### VS Code ###
 .vscode/
 
-gradlew
 gradle
 .gradle/
 .gradle
-gradlew.bat
