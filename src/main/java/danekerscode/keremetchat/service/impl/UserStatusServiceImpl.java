@@ -18,13 +18,13 @@ import java.util.function.Supplier;
 @Slf4j
 public class UserStatusServiceImpl implements UserStatusService {
 
-    private final HashOperations<String,Object,Object> hashOperations;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final Supplier<LocalDateTime> currentDateTime = LocalDateTime::now;
 
     @Override
     public UserActivity getUserActivity(Long userId) {
         return Optional.ofNullable(
-                        this.hashOperations.get(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId)
+                        this.redisTemplate.opsForHash().get(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId)
                 )
                 .map(UserActivity.class::cast)
                 .orElse(UserActivity.defaultUserActivityForUserId(userId));
@@ -59,13 +59,13 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     private void clearUserActivity(Long userId) {
         log.info("Clearing user activity for user id: {}", userId);
-        this.hashOperations
+        this.redisTemplate.opsForHash()
                 .delete(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId);
     }
 
     private void saveUserActivity(UserActivity userActivity) {
         log.info("Saving user activity: {}", userActivity);
-        this.hashOperations
+        this.redisTemplate.opsForHash()
                 .put(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userActivity.getUserId(), userActivity);
     }
 }

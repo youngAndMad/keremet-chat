@@ -25,7 +25,6 @@ public final class UserStatusController extends AbstractWebSocketController {
         var userNotifications = userNotificationService.getUserNotifications(user.getId());
 
         userNotifications.forEach(userNotification -> {
-
             super.deliverWebSocketMessage(userNotification, WebSocketDestination.USER_NOTIFICATION, user.getId());
         });
     }

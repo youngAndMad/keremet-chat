@@ -5,6 +5,7 @@ import danekerscode.keremetchat.model.dto.request.websocket.DeliverNotificationR
 import danekerscode.keremetchat.model.entity.UserNotification;
 import danekerscode.keremetchat.service.UserNotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserNotificationServiceImpl implements UserNotificationService {
 
-    private final SetOperations<String, Object> setOperations;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public <Content extends Serializable> UserNotification<Content> save(
@@ -25,7 +26,7 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     ) {
         var setKay = getUserNotificationsSetKey(userNotification.getUserId());
 
-        setOperations.add(setKay, userNotification);
+        redisTemplate.opsForSet().add(setKay, userNotification);
 
         return userNotification;
     }
@@ -34,7 +35,7 @@ public class UserNotificationServiceImpl implements UserNotificationService {
     public List<UserNotification> getUserNotifications(Long userId) {
         var setKay = getUserNotificationsSetKey(userId);
 
-        return Optional.ofNullable(setOperations.members(setKay))
+        return Optional.ofNullable(redisTemplate.opsForSet().members(setKay))
                 .stream()
                 .flatMap(Collection::stream)
                 .map(UserNotification.class::cast)
