@@ -10,6 +10,7 @@ import danekerscode.keremetchat.model.enums.ChatUserRole;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
+import danekerscode.keremetchat.model.projection.ChatProjection;
 import danekerscode.keremetchat.repository.ChatRepository;
 import danekerscode.keremetchat.service.ChatMemberService;
 import danekerscode.keremetchat.service.ChatService;
@@ -43,7 +44,6 @@ public class ChatServiceImpl implements ChatService {
 
         chat.setName(chatOwner.getUser().getUsername() + ":" + chatMember.getUser().getUsername());
         chat.setType(ChatType.PRIVATE);
-//        chat.setMembers(List.of(chatOwner, chatMember));
         chatRepository.save(chat);
 
         return new IdDto<>(chat.getId());
@@ -99,5 +99,11 @@ public class ChatServiceImpl implements ChatService {
         this.chatRepository.deleteAvatar(chatId,fileId);
 
         this.fileStorageService.deleteFile(fileId);
+    }
+
+    @Override
+    public ChatProjection findById(Long chatId) {
+        return chatRepository.findChatById(chatId)
+                .orElseThrow(() -> new EntityNotFoundException(Chat.class, chatId));
     }
 }

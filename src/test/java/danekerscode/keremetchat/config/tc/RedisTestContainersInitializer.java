@@ -1,4 +1,4 @@
-package danekerscode.keremetchat.config;
+package danekerscode.keremetchat.config.tc;
 
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;

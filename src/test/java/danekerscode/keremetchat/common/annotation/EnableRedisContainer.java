@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.common.annotation;
 
-import danekerscode.keremetchat.config.RedisTestContainersInitializer;
+import danekerscode.keremetchat.config.tc.RedisTestContainersInitializer;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.annotation.ElementType;

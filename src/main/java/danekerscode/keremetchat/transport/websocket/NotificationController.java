@@ -1,6 +1,5 @@
 package danekerscode.keremetchat.transport.websocket;
 
-import danekerscode.keremetchat.model.UserActivity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.Authentication;

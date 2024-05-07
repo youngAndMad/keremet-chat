@@ -2,13 +2,14 @@ package danekerscode.keremetchat.transport.websocket;
 
 import danekerscode.keremetchat.model.dto.request.websocket.MessageRequest;
 import danekerscode.keremetchat.model.entity.UserNotification;
+import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;
 import danekerscode.keremetchat.model.enums.websocket.WebsocketNotificationType;
-import danekerscode.keremetchat.model.notification.MessageNotification;
 import danekerscode.keremetchat.service.MessageService;
 import danekerscode.keremetchat.service.UserNotificationService;
 import danekerscode.keremetchat.service.UserStatusService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -18,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 public final class MessageController extends AbstractWebSocketController {
 
     private final MessageService messageService;
@@ -32,22 +34,22 @@ public final class MessageController extends AbstractWebSocketController {
     ) {
         var user = super.getUserFromAuthentication(auth);
 
-        messageService.saveMessage(user, chatId, messageRequest);
+        var messageNotification = messageService.saveMessage(user, chatId, messageRequest);
 
         var chatMembers = super.findChatMemberUsersId(chatId);
 
         chatMembers.stream()
                 .map(userStatusService::getUserActivity)
                 .forEach(userActivity -> {
+                    var notification = new UserNotification<>(
+                            userActivity.getUserId(),
+                            WebsocketNotificationType.MESSAGE,
+                            messageNotification
+                    );
                     if (!userActivity.isOnline()) {
-                        var notification = new UserNotification<MessageNotification>();
-                        notification.setType(WebsocketNotificationType.MESSAGE);
-                        notification.setUserId(userActivity.getUserId());
-
-//                        var notificationContent =
-                        // todo send real time message with web socket
+                        userNotificationService.save(notification);
                     } else {
-//                        userNotificationService.save() todo save notification for user
+                        super.deliverWebSocketMessage(notification, WebSocketDestination.USER_NOTIFICATION, userActivity.getUserId());
                     }
                 });
     }

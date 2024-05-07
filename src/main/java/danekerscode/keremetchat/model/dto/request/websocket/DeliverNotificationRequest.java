@@ -10,13 +10,13 @@ import java.io.Serializable;
  * Data transfer object to send notifications through websocket
  * Generic raw type Content means type of expected content in notification
  *
- * @param identifier identifier of receiver, will be null if type is WebsocketNotificationType.GLOBAL
+ * @param userId identifier of receiver
  * @param <Content>  type of content
  * @param content    value of content
  * @param type       type of websocket notification type
  */
 public record DeliverNotificationRequest<Content extends Serializable>(
-        @NotNull Long identifier,
+        @NotNull Long userId,
         @NotNull WebsocketNotificationType type,
         @Nullable Content content
 ) {

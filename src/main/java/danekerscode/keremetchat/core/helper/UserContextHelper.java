@@ -39,7 +39,7 @@ public class UserContextHelper {
 
         if (currentAuthPrincipal instanceof DefaultOAuth2User defaultOAuth2User) {
             var username = defaultOAuth2User.getName();
-            return userRepository.findByUsername( username).orElseThrow(() -> new RuntimeException("User not found"));
+            return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         }
 
         if (currentAuthPrincipal instanceof CustomUserDetails customUserDetails) {

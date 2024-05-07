@@ -1,10 +1,10 @@
 package danekerscode.keremetchat.service;
 
-import danekerscode.keremetchat.common.annotation.EnablePostgresContainer;
+import danekerscode.keremetchat.common.annotation.EnableRedisContainer;
 
-@EnablePostgresContainer
+@EnableRedisContainer
 public class UserStatusServiceIT {
 
- //todo implement tests
+
 
 }

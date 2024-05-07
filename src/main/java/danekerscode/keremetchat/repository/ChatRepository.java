@@ -2,12 +2,14 @@ package danekerscode.keremetchat.repository;
 
 import danekerscode.keremetchat.model.entity.Chat;
 import danekerscode.keremetchat.model.entity.FileEntity;
+import danekerscode.keremetchat.model.projection.ChatProjection;
 import danekerscode.keremetchat.repository.common.CommonRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRepository extends CommonRepository<Chat, Long> {
@@ -31,4 +33,6 @@ public interface ChatRepository extends CommonRepository<Chat, Long> {
     """)
     @Modifying
     void deleteAvatar(Long chatId, Long fileEntityId);
+
+    Optional<ChatProjection> findChatById(Long chatId);
 }

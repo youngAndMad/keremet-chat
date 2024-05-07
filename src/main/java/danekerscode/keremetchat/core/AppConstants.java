@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum AppConstants {
 
+    USER_NOTIFICATION_REDIS_SET_PREFIX("user_notification:"),
+
     REQUEST_START_TIME("request_start_time"),
 
     LOGGING_PATH_PATTERN("/api/**"),

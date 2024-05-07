@@ -5,6 +5,7 @@ import danekerscode.keremetchat.core.helper.UserContextHelper;
 import danekerscode.keremetchat.core.helper.WebSocketMessagingHelper;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.entity.UserNotification;
 import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;
 import danekerscode.keremetchat.service.ChatMemberService;
 import danekerscode.keremetchat.service.UserStatusService;
@@ -15,8 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public sealed abstract class AbstractWebSocketController permits
-    MessageController,NotificationController,UserStatusController {
+public class AbstractWebSocketController {
 
     @Autowired
     private UserContextHelper userContextHelper;
@@ -32,19 +32,19 @@ public sealed abstract class AbstractWebSocketController permits
     }
 
     protected void deliverWebSocketMessage(
-            Object data,
+            UserNotification<?> userNotification,
             WebSocketDestination webSocketDestination,
             Long... destinationIdentifiers
-    ){
+    ) {
         this.webSocketMessagingHelper
-                .deliver(data, webSocketDestination,destinationIdentifiers);
+                .deliver(userNotification, webSocketDestination, destinationIdentifiers);
     }
 
-    protected List<Long> findChatMemberUsersId(Long chatId){
+    protected List<Long> findChatMemberUsersId(Long chatId) {
         return this.chatMemberService.findChatMemberUsersId(chatId);
     }
 
-    protected UserActivity getUserActivity(Long userId){
+    protected UserActivity getUserActivity(Long userId) {
         return this.userStatusService.getUserActivity(userId);
     }
 
