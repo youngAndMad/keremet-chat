@@ -38,5 +38,6 @@ build/
 
 gradlew
 gradle
+.gradle/
 .gradle
 gradlew.bat
