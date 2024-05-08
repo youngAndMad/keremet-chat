@@ -7,6 +7,7 @@ import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.exception.Oauth2ProcessingException;
 import danekerscode.keremetchat.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -68,6 +69,12 @@ public class AuthController {
     ) {
         return authService.login(loginRequest, request, response);
     }
+
+    @GetMapping("login")
+    String test(){
+        throw new Oauth2ProcessingException("err");
+    }
+
 
     @PostMapping("reset-password")
     @Operation(description = "Reset password", responses = {

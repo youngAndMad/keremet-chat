@@ -2,22 +2,22 @@ package danekerscode.keremetchat.transport.http.advice;
 
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
-import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
+import danekerscode.keremetchat.model.exception.Oauth2ProcessingException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
 
     @PostConstruct
-    void postConstruct(){
-      log.info("GlobalExceptionHandler initialized");
+    void postConstruct() {
+        log.info("GlobalExceptionHandler initialized");
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -30,13 +30,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(AuthProcessingException.class)
-    public ProblemDetail handleAuthProcessingException(
+    ProblemDetail handleAuthProcessingException(
             AuthProcessingException e
     ) {
         return ProblemDetail
                 .forStatusAndDetail(
-                        HttpStatus.BAD_REQUEST,
+                        e.getResponseStatus(),
                         e.getMessage()
                 );
+    }
+
+    @ExceptionHandler(Oauth2ProcessingException.class)
+    ResponseEntity<ProblemDetail> handleOauth2ProcessingException(
+            Oauth2ProcessingException e
+    ) {
+        return new ResponseEntity<>(ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                e.getMessage()
+        ), HttpStatus.UNAUTHORIZED);
     }
 }

@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.security.CustomUserDetailsService;
+import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
@@ -26,6 +27,8 @@ import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -81,18 +84,27 @@ public class SecurityConfig {
     }
 
     @Bean
+    OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver(
+            ClientRegistrationRepository clientRegistrationRepository
+    ) {
+        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,"/oauth2/authorization");
+    }
+
+
+    @Bean
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
-            HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository
+            HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
+            OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers(HttpMethod.GET,"/api/v1/client-registration").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/client-registration").permitAll()
                                 .requestMatchers(publicEndpoints).permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .anyRequest().authenticated()
@@ -104,6 +116,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .authorizationEndpoint(
                                         authEndpoint -> authEndpoint
+                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver)
                                                 .authorizationRequestRepository(authorizationRequestRepository)
                                 )
                 )
