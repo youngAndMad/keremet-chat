@@ -2,17 +2,14 @@ package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.core.annotation.FetchUserContext;
-import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.model.dto.request.UsersCriteria;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.service.UserService;
-import danekerscode.keremetchat.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,15 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User")
 public class UserController {
 
-    private final UserStatusService userStatusService;
     private final UserService userService;
-
-    @GetMapping("status/{userId}")
-    UserActivity getUserActivity(
-            @PathVariable @NotNull @Positive Long userId
-    ) {
-        return this.userStatusService.getUserActivity(userId);
-    }
 
     @Operation(
             summary = "Delete user by id",
@@ -45,7 +34,7 @@ public class UserController {
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{userId}")
-    @FetchUserContext
+    @FetchUserContext(checkPersonalAccess = true)
     void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId, UserContextHolder.getContext());
     }

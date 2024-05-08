@@ -57,6 +57,12 @@ public class UserStatusServiceImpl implements UserStatusService {
         log.info("User {} is offline", userId);
     }
 
+    @Override
+    public Long getOnlineUsersCount() {
+        return this.redisTemplate.opsForHash()
+                .size(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue());
+    }
+
     private void clearUserActivity(Long userId) {
         log.info("Clearing user activity for user id: {}", userId);
         this.redisTemplate.opsForHash()

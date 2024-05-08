@@ -28,4 +28,9 @@ public interface UserStatusService {
      * @param userId The unique identifier of the user.
      */
     void setOfflineStatus(Long userId);
+
+    /**
+     * Retrieves count of online users
+     * */
+    Long getOnlineUsersCount();
 }
