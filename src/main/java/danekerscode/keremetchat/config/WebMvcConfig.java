@@ -3,6 +3,7 @@ package danekerscode.keremetchat.config;
 import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.core.interceptor.LoggingInterceptor;
 import danekerscode.keremetchat.config.properties.AppProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -14,12 +15,14 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebMvc
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final LoggingInterceptor loggingInterceptor;
 
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(new LoggingInterceptor())
+        registry.addInterceptor(loggingInterceptor)
                 .addPathPatterns(AppConstants.LOGGING_PATH_PATTERN.getValue());
 
         WebMvcConfigurer.super.addInterceptors(registry);

@@ -22,6 +22,7 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+    date-format: 'yyyy-MM-dd HH:mm:ss'
   jpa:
     open-in-view: false
     hibernate:

@@ -25,5 +25,7 @@ public interface UserRepository extends CommonRepository<User, Long>,
     @Query("UPDATE User u SET u.isActive = false WHERE u.id = :id")
     void deactivateUser(Long id);
 
+    @Modifying
+    @Query("DELETE User u where u.isActive=false")
     int deleteAllByActiveFalse();
 }

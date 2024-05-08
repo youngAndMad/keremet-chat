@@ -113,7 +113,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .authorizationEndpoint(
                                         authEndpoint -> authEndpoint
-                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver)
+//                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver)
                                                 .authorizationRequestRepository(authorizationRequestRepository)
                                 )
                 )

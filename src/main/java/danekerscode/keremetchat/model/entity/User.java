@@ -39,10 +39,4 @@ public class User extends BaseEntity implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ChatMember> chatMembers;
-
-    public boolean isAdmin() {
-        return roles != null && roles.stream()
-                .anyMatch(role -> role.getType() == SecurityRoleType.ROLE_APPLICATION_ROOT_ADMIN);
-    }
-
 }
