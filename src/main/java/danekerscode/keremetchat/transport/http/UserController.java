@@ -57,4 +57,11 @@ public class UserController {
         return userService.filterUsers(criteria, PageRequest.of(page, pageSize));
     }
 
+    @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
+    @DeleteMapping("inactive")
+    @Operation(description = "Delete all inactive users")
+    void deleteInactiveUsers() {
+        userService.deleteInactiveUsers();
+    }
+
 }

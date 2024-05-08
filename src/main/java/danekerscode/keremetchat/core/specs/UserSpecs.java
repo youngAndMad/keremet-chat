@@ -13,13 +13,24 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 
+/**
+ * Utility class to generate specifications from passed criteria\
+ * @author youngAndMad
+ */
 @UtilityClass
 public class UserSpecs {
 
+    /**
+     * @param criteria criteria for users filtering
+     * @return Specification to filter users by passes criteria
+     * @see org.springframework.data.jpa.domain.Specification
+     * @see danekerscode.keremetchat.model.dto.request.UsersCriteria
+     * @author youngAndMad
+     */
     public static Specification<User> fromUsersCriteria(
             UsersCriteria criteria
     ) {
-        return ((root, query, cb) -> {
+        return ((root, q, cb) -> {
             var predicates = new ArrayList<Predicate>();
 
             if (Boolean.TRUE.equals(criteria.isActive())) {

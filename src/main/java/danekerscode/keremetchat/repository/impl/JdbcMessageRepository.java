@@ -4,6 +4,7 @@ import danekerscode.keremetchat.model.entity.Message;
 import danekerscode.keremetchat.repository.MessageRepository;
 import danekerscode.keremetchat.utils.JdbcUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -14,13 +15,15 @@ import java.util.HashMap;
 public class JdbcMessageRepository implements MessageRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public JdbcMessageRepository(JdbcTemplate jdbcTemplate) {
+    public JdbcMessageRepository(JdbcTemplate jdbcTemplate, JdbcClient jdbcClient) {
         this.jdbcTemplate = jdbcTemplate;
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(JdbcUtils.extractTableName(Message.class))
                 .usingGeneratedKeyColumns(JdbcUtils.extractIdColumnName(Message.class));
+        this.jdbcClient = jdbcClient;
     }
 
     @Override

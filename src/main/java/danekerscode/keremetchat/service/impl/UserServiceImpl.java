@@ -107,6 +107,12 @@ public class UserServiceImpl implements UserService {
                 .map(this.userMapper::toResponseDto);
     }
 
+    @Override
+    @Transactional
+    public int deleteInactiveUsers() {
+        return userRepository.deleteAllByActiveFalse();
+    }
+
     private static void validatePrivateActionAccess(
             User currentUser,
             Long userId,

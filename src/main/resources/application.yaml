@@ -1,4 +1,6 @@
 server:
+  error:
+    include-stacktrace: never
   servlet:
     session:
       cookie:
@@ -12,6 +14,9 @@ logging:
       security: trace
 
 spring:
+  mvc:
+    problemdetails:
+      enabled: true
   main:
     banner-mode: off
   jackson:
@@ -80,6 +85,8 @@ app:
   websocket:
     allowed-origins: 'http://localhost:5173/'
   security:
+    delete-inactive-users: true
+    delete-inactive-users-cron: '0 0 0 * * *' # every day at midnight
     default-admin:
       email: 'keremetchatadmin@gmail.com'
       password: 'keremetchatadmin'

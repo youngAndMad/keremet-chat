@@ -11,5 +11,6 @@
     <include file="db/changelog/changeset/db.changelog-1.4-create-security-role-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.5-create-oauth2-client-registration-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.6-create-message-table.sql"/>
+    <include file="db/changelog/changeset/db.changelog-1.7-create-shedlock-table.sql"/>
 
 </databaseChangeLog>

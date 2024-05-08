@@ -9,7 +9,14 @@ import java.util.List;
 @Getter
 public enum WebsocketNotificationType {
     MESSAGE(false),
-    TYPING(true); // todo add more websocket notification types
+    SENDING_VIDEO(true),
+    SENDING_PHOTO(true),
+    RECORDING_VOICE_MESSAGE(true),
+    RECORDING_VIDEO_MESSAGE(true),
+    JOIN_CHAT(false),
+    LEFT_CHAT(false),
+    PINNED_MESSAGE (false),
+    TYPING(true);
 
     private final boolean onlyForOnlineUsers;
 }

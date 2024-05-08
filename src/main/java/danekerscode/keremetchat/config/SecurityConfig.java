@@ -1,10 +1,7 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.security.CustomUserDetailsService;
-import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
-import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
-import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import danekerscode.keremetchat.security.oauth2.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;

@@ -22,4 +22,6 @@ public interface UserService {
     void deactivateUser(Long id, User currentUser);
 
     Page<UserResponseDto> filterUsers(UsersCriteria criteria, PageRequest pageRequest);
+
+    int deleteInactiveUsers();
 }
