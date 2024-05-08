@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.utils;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.util.SerializationUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 
+@UtilityClass
 public class CookieUtils {
 
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {

@@ -1,5 +1,7 @@
 package danekerscode.keremetchat.utils;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -18,6 +20,24 @@ public class JdbcUtils {
     ) {
         var table = clazz.getAnnotation(Table.class);
         return table == null ? toSnakeCase(clazz.getSimpleName()) : table.name();
+    }
+
+    public static String extractIdColumnName(Class<?> clazz) {
+        var fields = clazz.getDeclaredFields();
+
+        for (var field : fields) {
+            if (field.isAnnotationPresent(Id.class)) {
+
+                if (field.isAnnotationPresent(Column.class)) {
+                    var column = field.getAnnotation(Column.class);
+                    return column.name();
+                }
+
+                return toSnakeCase(field.getName());
+            }
+        }
+
+        throw new IllegalArgumentException("No id column found");
     }
 
     public static List<SqlParameterValue> clientRegistrationToSqlParameterList(

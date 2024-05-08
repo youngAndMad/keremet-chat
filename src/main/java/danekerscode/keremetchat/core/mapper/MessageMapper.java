@@ -19,7 +19,7 @@ public interface MessageMapper {
     @Mapping(target = "parentId", source = "messageRequest.parentId")
     @Mapping(target = "content", source = "messageRequest.content")
     @Mapping(target = "files", expression = "java(files)")
-    @Mapping(target = "sentTime", constant = "LocalDateTime.now()")
+    @Mapping(target = "sentTime", expression = "java(LocalDateTime.now())")
     MessageNotification toNotification(
             User sender,
             ChatProjection chat,

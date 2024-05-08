@@ -39,6 +39,7 @@ public final class MessageController extends AbstractWebSocketController {
         var chatMembers = super.findChatMemberUsersId(chatId);
 
         chatMembers.stream()
+                .filter(userId -> !userId.equals(user.getId()))
                 .map(userStatusService::getUserActivity)
                 .forEach(userActivity -> {
                     var notification = new UserNotification<>(

@@ -29,7 +29,7 @@ public class FileController {
             @PathVariable Long id
     ) {
         return fileStorageService.downloadFile(id)
-                .thenApplyAsync(HttpUtils::writeFileInputStreame);
+                .thenApplyAsync(HttpUtils::writeFileInputStream);
     }
 
     @GetMapping("download/with-path/{path}")
@@ -38,7 +38,7 @@ public class FileController {
             @PathVariable String path
     ) {
         return fileStorageService.downloadFileWithPath(path)
-                .thenApplyAsync(HttpUtils::writeFileInputStreame);
+                .thenApplyAsync(HttpUtils::writeFileInputStream);
     }
 
     @GetMapping("{id}")

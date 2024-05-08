@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 @UtilityClass
 public class HttpUtils {
 
-    public static ResponseEntity<InputStreamResource> writeFileInputStreame(
+    public static ResponseEntity<InputStreamResource> writeFileInputStream(
             DownloadFileResponse downloadFileResponse
     ) {
         return ResponseEntity.ok()
