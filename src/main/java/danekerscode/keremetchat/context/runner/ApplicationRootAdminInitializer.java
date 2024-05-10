@@ -1,9 +1,9 @@
 package danekerscode.keremetchat.context.runner;
 
+import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -14,15 +14,12 @@ import org.springframework.stereotype.Component;
 public class ApplicationRootAdminInitializer implements ApplicationRunner {
 
     private final UserService userService;
-
-    @Value("${app.security.default-admin.email}")
-    private String applicationRootAdminEmail;
-    @Value("${app.security.default-admin.password}")
-    private String applicationRootAdminPassword;
+    private final AppProperties appProperties;
 
     @Override
-    public void run(ApplicationArguments args){
-        userService.checkApplicationRootUser(applicationRootAdminEmail,applicationRootAdminPassword);
+    public void run(ApplicationArguments args) {
+        var defaultAdmin = appProperties.getSecurity().getDefaultAdmin();
+        userService.checkApplicationRootUser(defaultAdmin.getEmail(), defaultAdmin.getPassword());
     }
 
 }

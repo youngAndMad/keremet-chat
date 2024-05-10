@@ -37,7 +37,7 @@ public class ChatServiceImpl implements ChatService {
     public IdDto<Long> createChat(CreatePrivateChatRequest createChatRequest) {
         var chat = chatRepository.save(new Chat());
 
-        var chatOwner = chatMemberService.forUserWithRole(UserContextHolder.getContext(), ChatUserRole.DEFAULT, chat);
+        var chatOwner = chatMemberService.forUserWithRole(UserContextHolder.getContext(), ChatUserRole.OWNER, chat);
         var secondChatMember = userService.findByEmail(createChatRequest.receiverEmail());
 
         var chatMember = chatMemberService.forUserWithRole(secondChatMember, ChatUserRole.DEFAULT, chat);

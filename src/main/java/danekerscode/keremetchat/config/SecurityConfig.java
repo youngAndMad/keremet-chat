@@ -156,7 +156,7 @@ public class SecurityConfig {
     }
 
     private CommonOAuth2Provider getProviderNameByRegistrationId(String registrationId) {
-        var provider = env.getProperty("spring.security.oauth2.client.registration." + registrationId + ".common-provider-type", CommonOAuth2Provider.class);
+        var provider = env.getProperty("spring.security.oauth2.client.registration.%s.common-provider-type".formatted(registrationId), CommonOAuth2Provider.class);
 
         if (provider == null) {
             throw new IllegalArgumentException("Unknown provider: " + registrationId);

@@ -86,7 +86,7 @@ app:
   websocket:
     allowed-origins: 'http://localhost:5173/'
   security:
-    delete-inactive-users: true
+    delete-inactive-users: false
     delete-inactive-users-cron: '0 0 0 * * *' # every day at midnight
     default-admin:
       email: 'keremetchatadmin@gmail.com'

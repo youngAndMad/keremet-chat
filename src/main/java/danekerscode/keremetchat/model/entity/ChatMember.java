@@ -13,11 +13,9 @@ public class ChatMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
     @Enumerated(EnumType.STRING)
     private ChatUserRole role;
     @ManyToOne
-    @JoinColumn(name = "chat_id", referencedColumnName = "id")
     private Chat chat;
 }
