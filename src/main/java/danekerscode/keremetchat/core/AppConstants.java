@@ -9,6 +9,8 @@ public enum AppConstants {
 
     USER_NOTIFICATION_REDIS_SET_PREFIX("user_notification:"),
 
+    ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN("spring.security.oauth2.client.registration.%s.common-provider-type"),
+
     REQUEST_START_TIME("request_start_time"),
 
     LOGGING_PATH_PATTERN("/api/**"),

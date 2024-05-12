@@ -42,8 +42,8 @@ public class ChatNotificationRepositoryImpl implements ChatNotificationRepositor
                 .param("content", ObjectMapperUtils.asString(content), Types.OTHER)
                 .update(keyHolder, "id");
 
-        var id = Objects.requireNonNull(keyHolder.getKey());
-        return new IdDto<>((long) id);
+        var id = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        return new IdDto<>(id);
     }
 
     @Override

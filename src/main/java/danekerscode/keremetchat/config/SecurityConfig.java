@@ -1,7 +1,10 @@
 package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.security.CustomUserDetailsService;
-import danekerscode.keremetchat.security.oauth2.*;
+import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
+import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
@@ -33,7 +36,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static danekerscode.keremetchat.core.AppConstants.ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN;
 
 @Configuration
 @EnableWebSecurity
@@ -84,7 +90,7 @@ public class SecurityConfig {
     OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver(
             ClientRegistrationRepository clientRegistrationRepository
     ) {
-        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository,"/oauth2/authorization");
+        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
     }
 
 
@@ -108,14 +114,14 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
-                                .successHandler(authenticationSuccessHandler)
-                                .permitAll()
-                                .authorizationEndpoint(
-                                        authEndpoint -> authEndpoint
+                                oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
+                                        .successHandler(authenticationSuccessHandler)
+                                        .permitAll()
+                                        .authorizationEndpoint(
+                                                authEndpoint -> authEndpoint
 //                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver)
-                                                .authorizationRequestRepository(authorizationRequestRepository)
-                                )
+                                                        .authorizationRequestRepository(authorizationRequestRepository)
+                                        )
                 )
                 /*
                  * If you request POST /logout, then it will perform the following default operations using a series of LogoutHandlers:
@@ -137,10 +143,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationProvider daoAuthenticationProvider(CustomUserDetailsService userDetailsService) {
+    AuthenticationProvider daoAuthenticationProvider(
+            CustomUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
         var authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         authenticationProvider.setHideUserNotFoundExceptions(false);
         return authenticationProvider;
     }
@@ -156,13 +165,9 @@ public class SecurityConfig {
     }
 
     private CommonOAuth2Provider getProviderNameByRegistrationId(String registrationId) {
-        var provider = env.getProperty("spring.security.oauth2.client.registration.%s.common-provider-type".formatted(registrationId), CommonOAuth2Provider.class);
-
-        if (provider == null) {
-            throw new IllegalArgumentException("Unknown provider: " + registrationId);
-        }
-
-        return provider;
+        return Optional
+                .ofNullable(env.getProperty(ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN.getValue().formatted(registrationId), CommonOAuth2Provider.class))
+                .orElseThrow(() -> new IllegalArgumentException("Unknown provider: " + registrationId));
     }
 }
 
