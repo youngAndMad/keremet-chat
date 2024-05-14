@@ -38,7 +38,7 @@ public class ChatController {
     @ResponseStatus(HttpStatus.CREATED)
     @FetchUserContext
     IdDto<Long> createChat(
-            @RequestBody @Validated CreateGroupChatRequest createGroupChatRequest
+            @ModelAttribute @Validated CreateGroupChatRequest createGroupChatRequest
     ) {
         return chatService.createGroupChat(createGroupChatRequest, UserContextHolder.getContext());
     }
@@ -85,12 +85,12 @@ public class ChatController {
     }
 
     @FetchUserContext
-    @Operation(description = "Delete member f")
+    @Operation(description = "Delete member from group")
     @PostMapping("{id}/block/{userId}")
     void deleteUserFromChat(
             @PathVariable Long id,
             @PathVariable Long userId
-    ){
+    ) {
         chatService.deleteChatMember(userId, id, UserContextHolder.getContext());
     }
 }

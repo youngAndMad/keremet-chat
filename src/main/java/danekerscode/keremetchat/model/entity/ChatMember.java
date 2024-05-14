@@ -24,4 +24,12 @@ public class ChatMember extends BaseEntity {
     public boolean isNotStaffMember(){
         return role != ChatUserRole.ADMIN && role != ChatUserRole.OWNER;
     }
+
+    public boolean isOwner() {
+        return role == ChatUserRole.OWNER;
+    }
+
+    public boolean isMember() {
+        return role == ChatUserRole.MEMBER;
+    }
 }

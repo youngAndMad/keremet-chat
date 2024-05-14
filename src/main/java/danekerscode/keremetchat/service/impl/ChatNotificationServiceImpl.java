@@ -1,10 +1,8 @@
 package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
-import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
 import danekerscode.keremetchat.model.notification.ChatNotification;
 import danekerscode.keremetchat.model.notification.CommonChatNotificationRequest;
-import danekerscode.keremetchat.model.projection.ChatMemberProjection;
 import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,7 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
         var chat = chatService.findById(chatId);
 
         var member = chat.memberForUser(currentUser.id());
-        log.info("saveCommonNotification for member {}" , member.getId());
+        log.info("saveCommonNotification for member {}", member.getId());
 
         var chatNotification = new ChatNotification();
         chatNotification.setSenderId(currentUser.id());
@@ -55,7 +53,7 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
                 .param("notificationTime", now)
                 .param("type", request.type().name())
                 .param("content", null)
-                .update(idKeyHolder,"id"); //todo: move to repository layer
+                .update(idKeyHolder, "id"); //todo: move to repository layer
 
         var id = Objects.requireNonNull(idKeyHolder.getKey()).longValue();
         chatNotification.setId(id);
@@ -65,7 +63,7 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
     @Override
     public void cascadeForChat(Long chatId) {
         jdbc.sql("delete from chat_notification where chat_id = :chatId")
-                .param("chatId",chatId)
+                .param("chatId", chatId)
                 .update();
     }
 }

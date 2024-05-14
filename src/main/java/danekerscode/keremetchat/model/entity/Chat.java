@@ -5,19 +5,15 @@ import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.nullness.Opt;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
 @Setter
 public class Chat extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,15 +21,11 @@ public class Chat extends BaseEntity {
     private ChatType type;
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private ChatSettings settings;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinTable(
-            name = "chat_avatars",
-            joinColumns = @JoinColumn(name = "chat_id"),
-            inverseJoinColumns = @JoinColumn(name = "file_entity_id")
-    )
+    @JoinTable(inverseJoinColumns = @JoinColumn(name = "file_entity_id"))
     private List<FileEntity> avatars;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
