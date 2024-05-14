@@ -21,12 +21,8 @@ public class ChatMember extends BaseEntity {
 
     private Long lastReceivedNotificationId;
 
-    public boolean isNotStaffMember(){
+    public boolean isNotStaffMember() {
         return role != ChatUserRole.ADMIN && role != ChatUserRole.OWNER;
-    }
-
-    public boolean isOwner() {
-        return role == ChatUserRole.OWNER;
     }
 
     public boolean isMember() {

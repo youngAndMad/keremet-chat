@@ -14,18 +14,18 @@ import org.springframework.stereotype.Controller;
 public final class UserStatusController extends AbstractWebSocketController {
 
     private final UserStatusService userStatusService;
-    private final UserNotificationService userNotificationService;
+//    private final UserNotificationService userNotificationService;
 
     @MessageMapping("/user/status/start-session")
     void startUserSession(Authentication auth) {
         var user = super.getUserFromAuthentication(auth);
         userStatusService.setOnlineStatus(user.getId());
-
-        var userNotifications = userNotificationService.getUserNotifications(user.getId());
-
-        userNotifications.forEach(userNotification -> {
-            super.deliverWebSocketMessage(userNotification, WebSocketDestination.USER_NOTIFICATION, user.getId());
-        });
+//
+//        var userNotifications = userNotificationService.getUserNotifications(user.getId());
+//
+//        userNotifications.forEach(userNotification -> {
+//            super.deliverWebSocketMessage(userNotification, WebSocketDestination.USER_NOTIFICATION, user.getId());
+//        });
     }
 
     @MessageMapping("/user/status/close-session")

@@ -5,8 +5,8 @@ import danekerscode.keremetchat.model.notification.ChatNotification;
 import danekerscode.keremetchat.model.notification.CommonChatNotificationRequest;
 import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
@@ -16,12 +16,16 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class ChatNotificationServiceImpl implements ChatNotificationService {
 
     private final JdbcClient jdbc;
     private final ChatService chatService;
+
+    public ChatNotificationServiceImpl(JdbcClient jdbc,@Lazy ChatService chatService) {
+        this.jdbc = jdbc;
+        this.chatService = chatService;
+    }
 
     @Override
     @Transactional

@@ -20,6 +20,7 @@ public class MinioBucketInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         var bucketName = AppConstants.MINIO_DEFAULT_BUCKET.getValue();
+
         var bucketExists = minioClient.bucketExists(
                 BucketExistsArgs.builder()
                         .bucket(bucketName)

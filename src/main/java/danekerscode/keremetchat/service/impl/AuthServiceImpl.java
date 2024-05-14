@@ -66,7 +66,8 @@ public class AuthServiceImpl implements AuthService {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
         }
 
-        var userSecurityRoles = Arrays.stream(roles).map(securityRoleService::findByType).collect(Collectors.toSet());
+        var userSecurityRoles = Arrays.stream(roles).map(securityRoleService::findByType)
+                .collect(Collectors.toSet());
         var hashPassword = passwordEncoder.encode(registrationRequest.password());
 
         var mappedUser = userMapper.registrationRequestToUser(registrationRequest, hashPassword);
@@ -90,7 +91,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserResponseDto login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public UserResponseDto login(
+            LoginRequest loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
         var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 loginRequest.email(), loginRequest.password()
         );

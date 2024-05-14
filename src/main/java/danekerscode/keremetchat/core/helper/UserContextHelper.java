@@ -8,6 +8,7 @@ import danekerscode.keremetchat.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +21,7 @@ import java.util.function.Supplier;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class UserContextHelper {
+public class UserContextHelper implements InitializingBean {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -28,7 +29,13 @@ public class UserContextHelper {
 
     // please never do this
     // simple way to avoid @Cacheable self-invocation
-    private final Supplier<UserContextHelper> self = () -> beanFactory.getBean(this.getClass());
+    private Supplier<UserContextHelper> self;
+
+    @Override
+    // also we can use @PostConstruct
+    public void afterPropertiesSet() throws Exception {
+        this.self = () -> beanFactory.getBean(this.getClass());
+    }
 
     @Cacheable(value = "userPrincipal", key = "#authentication.principal")
     public User extractUser(Authentication authentication) {
@@ -64,6 +71,5 @@ public class UserContextHelper {
     public UserResponseDto asResponseDto(Authentication authentication) {
         return userMapper.toResponseDto(self.get().extractUser(authentication));
     }
-
 
 }

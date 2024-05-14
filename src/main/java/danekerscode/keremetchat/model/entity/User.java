@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +31,6 @@ public class User extends BaseEntity implements Serializable {
     @ManyToMany
     @JoinTable(
             name = "users_security_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "security_role_id", referencedColumnName = "id")
     )
     private Set<SecurityRole> roles;
