@@ -18,4 +18,10 @@ public class ChatMember extends BaseEntity {
     private ChatUserRole role;
     @ManyToOne
     private Chat chat;
+
+    private Long lastReceivedNotificationId;
+
+    public boolean isNotStaffMember(){
+        return role != ChatUserRole.ADMIN && role != ChatUserRole.OWNER;
+    }
 }

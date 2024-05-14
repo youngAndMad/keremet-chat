@@ -11,21 +11,15 @@ import danekerscode.keremetchat.repository.FileEntityRepository;
 import danekerscode.keremetchat.service.FileStorageService;
 import danekerscode.keremetchat.utils.FileUtils;
 import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -112,7 +106,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public CompletableFuture<DownloadFileResponse> downloadFileWithPath(String objectPath) {
         var fileEntity = fileEntityRepository.findByPath(objectPath)
-                .orElseThrow(() -> new EntityNotFoundException(FileEntity.class, new KeyPair<>("path", objectPath)));
+                .orElseThrow(() -> new EntityNotFoundException(FileEntity.class,  KeyPair.of("path", objectPath)));
 
         return this.downloadFileByPath(fileEntity.getPath())
                 .thenApply((inputStreamResource -> new DownloadFileResponse(fileEntity, inputStreamResource)));

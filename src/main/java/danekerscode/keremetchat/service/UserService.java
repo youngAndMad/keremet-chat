@@ -24,4 +24,6 @@ public interface UserService {
     Page<UserResponseDto> filterUsers(UsersCriteria criteria, PageRequest pageRequest);
 
     int deleteInactiveUsers();
+
+    User findById(Long userId);
 }

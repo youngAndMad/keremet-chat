@@ -1,10 +1,9 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.context.holder.UserContextHolder;
+import danekerscode.keremetchat.model.dto.request.CreateGroupChatRequest;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
-import danekerscode.keremetchat.model.entity.Chat;
-import danekerscode.keremetchat.model.entity.FileEntity;
+import danekerscode.keremetchat.model.entity.*;
 import danekerscode.keremetchat.model.enums.ChatType;
 import danekerscode.keremetchat.model.enums.ChatUserRole;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
@@ -12,16 +11,13 @@ import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.exception.InvalidRequestPayloadException;
 import danekerscode.keremetchat.model.projection.ChatProjection;
 import danekerscode.keremetchat.repository.ChatRepository;
-import danekerscode.keremetchat.service.ChatMemberService;
-import danekerscode.keremetchat.service.ChatService;
-import danekerscode.keremetchat.service.FileStorageService;
-import danekerscode.keremetchat.service.UserService;
+import danekerscode.keremetchat.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -31,13 +27,17 @@ public class ChatServiceImpl implements ChatService {
     private final ChatMemberService chatMemberService;
     private final UserService userService;
     private final FileStorageService fileStorageService;
+    private final ChatNotificationService chatNotificationService;
+
 
     @Override
     @Transactional
-    public IdDto<Long> createChat(CreatePrivateChatRequest createChatRequest) {
+    public IdDto<Long> createPrivateChat(
+            CreatePrivateChatRequest createChatRequest, User currentUser
+    ) {
         var chat = chatRepository.save(new Chat());
 
-        var chatOwner = chatMemberService.forUserWithRole(UserContextHolder.getContext(), ChatUserRole.OWNER, chat);
+        var chatOwner = chatMemberService.forUserWithRole(currentUser, ChatUserRole.OWNER, chat);
         var secondChatMember = userService.findByEmail(createChatRequest.receiverEmail());
 
         var chatMember = chatMemberService.forUserWithRole(secondChatMember, ChatUserRole.DEFAULT, chat);
@@ -50,30 +50,55 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public void deletePrivateChat(Long chatId) {
-        var currentUser = UserContextHolder.getContext();
+    @Transactional
+    public IdDto<Long> createGroupChat(
+            CreateGroupChatRequest createGroupChatRequest,
+            User currentUser
+    ) {
+        var chat = chatRepository.save(new Chat());
 
-        if (!chatRepository.isExistByID(chatId)) {
-            throw new EntityNotFoundException(Chat.class, chatId);
+        var chatOwner = chatMemberService.forUserWithRole(currentUser, ChatUserRole.OWNER, chat);
+        var chatMembers = new ArrayList<>(
+                createGroupChatRequest.inviteMembers().stream().map(userService::findById)
+                        .map(user -> chatMemberService.forUserWithRole(user, ChatUserRole.MEMBER, chat))
+                        .toList()
+        );
+
+        chatMembers.add(chatOwner);
+        chat.setName(createGroupChatRequest.name());
+        chat.setMembers(chatMembers);
+        chat.setSettings(ChatSettings.defaultSettingsForChat(chat));
+
+        if (createGroupChatRequest.avatar() != null) {
+            var fileEntity = fileStorageService.save(
+                    createGroupChatRequest.avatar(),
+                    FileEntitySource.CHAT_AVATAR,
+                    String.valueOf(chat.getId())
+            );
+
+            var chatAvatars = new ArrayList<FileEntity>();
+            chatAvatars.add(fileEntity);
+            chat.setAvatars(chatAvatars);
         }
 
-        var chat = chatRepository.findByID(chatId);
+        chatRepository.save(chat);
 
-        if(chat.getType() != ChatType.PRIVATE){
-            throw new InvalidRequestPayloadException("Chat is not private");
-        }
-
-        if(chat.getMembers().stream().noneMatch(chatMember -> chatMember.getUser().getId().equals(currentUser.getId()))){
-            throw new InvalidRequestPayloadException("User is not a member of the chat");
-        }
-
-        chatRepository.deleteById(chatId);
+        return new IdDto<>(chat.getId());
     }
 
-    @Override
     @Transactional
-    public List<Long> getMemberUsersIdList(Long chatId) {
-        return chatRepository.getMemberUsersIdList(chatId);
+    @Override
+    public void deleteChat(Long chatId, User currentUser) {
+        var chat = this.findById(chatId);
+
+        var currentChatMember = chat.memberForUser(currentUser.getId());
+
+        if (!currentChatMember.isAdmin()) {
+            throw new InvalidRequestPayloadException("You are not a owner of current chat");
+        }
+
+        chatNotificationService.cascadeForChat(chatId);
+        chatRepository.deleteById(chatId);
     }
 
     @Override
@@ -88,7 +113,7 @@ public class ChatServiceImpl implements ChatService {
 
         var fileEntity = fileStorageService.save(file, FileEntitySource.CHAT_AVATAR, String.valueOf(chatId));
 
-        this.chatRepository.addAvatar(chatId,fileEntity.getId());
+        this.chatRepository.addAvatar(chatId, fileEntity.getId());
     }
 
     @Override
@@ -96,7 +121,7 @@ public class ChatServiceImpl implements ChatService {
     public void deleteAvatar(Long fileId, Long chatId) {
         this.chatRepository.checkExists(chatId);
 
-        this.chatRepository.deleteAvatar(chatId,fileId);
+        this.chatRepository.deleteAvatar(chatId, fileId);
 
         this.fileStorageService.deleteFile(fileId);
     }
@@ -105,5 +130,45 @@ public class ChatServiceImpl implements ChatService {
     public ChatProjection findById(Long chatId) {
         return chatRepository.findChatById(chatId)
                 .orElseThrow(() -> new EntityNotFoundException(Chat.class, chatId));
+    }
+
+    @Override
+    public void processUserInvitation(Long userId, Long chatId, User currentUser) {
+        var chat = fetchChatEntity(chatId);
+
+        if (chat.getType() == ChatType.PRIVATE) {
+            throw new InvalidRequestPayloadException("Can not invite users to private chat");
+        }
+
+        var userToInvite = userService.findById(userId);
+        var chatSettings = chat.getSettings();
+
+        if (!chatSettings.getEveryoneCanInviteMembers() &&
+                chat.memberForUser(currentUser.getId()).isNotStaffMember()
+        ) {
+            throw new InvalidRequestPayloadException("You are not allowed to invite users to this chat. Permission denied");
+        }
+
+        var chatMember = chatMemberService.forUserWithRole(userToInvite, ChatUserRole.MEMBER, chat);
+        chat.getMembers().add(chatMember);
+        chatRepository.save(chat);
+    }
+
+    private Chat fetchChatEntity(Long chatId) {
+        return this.chatRepository.findByID(chatId);
+    }
+
+    @Override
+    public void deleteChatMember(Long userId, Long chatId, User currentUser) {
+        var chat = fetchChatEntity(chatId);
+
+        var currentChatMember = chat.memberForUser(currentUser.getId());
+
+        if (currentChatMember.isNotStaffMember()){
+            throw new InvalidRequestPayloadException("You are not allowed to delete users from this chat. Permission denied");
+        }
+
+        chat.getMembers().remove(currentChatMember);
+        chatRepository.save(chat);
     }
 }

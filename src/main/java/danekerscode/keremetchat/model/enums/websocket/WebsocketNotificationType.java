@@ -1,9 +1,9 @@
 package danekerscode.keremetchat.model.enums.websocket;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 public enum WebsocketNotificationType {
     MESSAGE(false),
@@ -13,8 +13,13 @@ public enum WebsocketNotificationType {
     RECORDING_VIDEO_MESSAGE(true),
     JOIN_CHAT(false),
     LEFT_CHAT(false),
-    PINNED_MESSAGE (false),
+    PINNED_MESSAGE(false),
     TYPING(true);
 
     private final boolean onlyForOnlineUsers;
+    private final Class<?> notificationPayloadClass;
+
+    WebsocketNotificationType(boolean onlyForOnlineUsers) {
+        this(onlyForOnlineUsers, null); //todo refactor delete this constructor
+    }
 }

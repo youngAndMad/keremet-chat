@@ -108,4 +108,9 @@ public class UserServiceImpl implements UserService {
     public int deleteInactiveUsers() {
         return userRepository.deleteAllByActiveFalse();
     }
+
+    @Override
+    public User findById(Long userId) {
+        return userRepository.findByID(userId);
+    }
 }

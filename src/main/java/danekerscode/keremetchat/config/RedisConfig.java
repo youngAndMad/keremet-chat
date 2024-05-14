@@ -14,6 +14,8 @@ import java.time.Duration;
 public class RedisConfig {
 
     private static final int CACHE_TTL = 10;
+    public static final GenericJackson2JsonRedisSerializer GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER
+            = new GenericJackson2JsonRedisSerializer();
 
     @Bean
     RedisCacheConfiguration redisCacheConfiguration() {
@@ -23,7 +25,7 @@ public class RedisConfig {
                 .serializeValuesWith(
                         RedisSerializationContext
                                 .SerializationPair
-                                .fromSerializer(new GenericJackson2JsonRedisSerializer())
+                                .fromSerializer(GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER)
                 );
     }
 
@@ -31,10 +33,12 @@ public class RedisConfig {
     <K, V> RedisTemplate<K, V> redisTemplate(
             RedisConnectionFactory redisConnectionFactory
     ) {
-        RedisTemplate<K, V> redisTemplate = new RedisTemplate<>();
+        var redisTemplate = new RedisTemplate<K, V>();
+
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new GenericJackson2JsonRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setKeySerializer(GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER);
+        redisTemplate.setValueSerializer(GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER);
+
         return redisTemplate;
     }
 

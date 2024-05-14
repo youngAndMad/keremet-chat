@@ -3,8 +3,10 @@ package danekerscode.keremetchat.model.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import danekerscode.keremetchat.model.entity.AuthType;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
+import danekerscode.keremetchat.model.projection.ChatMemberProjection;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public record UserResponseDto(
@@ -16,6 +18,7 @@ public record UserResponseDto(
         LocalDateTime lastModifiedDate,
         Boolean isActive,
         AuthType authType,
-        Set<SecurityRoleType> roles
+        Set<SecurityRoleType> roles,
+        List<ChatMemberProjection> chatMembers
 ) {
 }

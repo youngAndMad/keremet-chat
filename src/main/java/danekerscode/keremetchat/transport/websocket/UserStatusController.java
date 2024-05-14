@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.transport.websocket;
 
 import danekerscode.keremetchat.model.enums.websocket.WebSocketDestination;
-import danekerscode.keremetchat.service.UserNotificationService;
 import danekerscode.keremetchat.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

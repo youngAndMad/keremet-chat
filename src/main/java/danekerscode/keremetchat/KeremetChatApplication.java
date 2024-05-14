@@ -2,7 +2,6 @@ package danekerscode.keremetchat;
 
 import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.model.enums.websocket.WebsocketNotificationType;
-import danekerscode.keremetchat.repository.ChatNotificationRepository;
 import lombok.Data;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;

@@ -6,8 +6,10 @@ server:
       cookie:
         http-only: false
   port: 8081
+
 logging:
   level:
+    danekerscode.keremetchat: debug
     org.springframework:
       web.socket: debug
       web: DEBUG
@@ -45,8 +47,6 @@ spring:
     database-change-log-lock-table: db_changelog_lock
     database-change-log-table: db_changelog
     change-log: db/changelog/db.changelog-master.xml
-    enabled: true
-    contexts: test
   security:
     oauth2:
       client:

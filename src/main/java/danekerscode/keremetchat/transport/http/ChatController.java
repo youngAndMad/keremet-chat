@@ -1,6 +1,8 @@
 package danekerscode.keremetchat.transport.http;
 
+import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.core.annotation.FetchUserContext;
+import danekerscode.keremetchat.model.dto.request.CreateGroupChatRequest;
 import danekerscode.keremetchat.model.dto.request.CreatePrivateChatRequest;
 import danekerscode.keremetchat.model.dto.response.IdDto;
 import danekerscode.keremetchat.service.ChatService;
@@ -24,25 +26,33 @@ public class ChatController {
     @PostMapping("/private")
     @FetchUserContext
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(description = "Create a private chat", responses = {
-            @ApiResponse(responseCode = "201", description = "Chat created. Will return id of created chat")
-    })
-    IdDto<Long> createChat(
+    @Operation(description = "Create a private chat")
+    IdDto<Long> createPrivateChat(
             @RequestBody @Validated CreatePrivateChatRequest createChatRequest
     ) {
-        return chatService.createChat(createChatRequest);
+        return chatService.createPrivateChat(createChatRequest, UserContextHolder.getContext());
     }
 
-    @DeleteMapping("/private/{chatId}")
+    @PostMapping
+    @Operation(description = "Create a group chat")
+    @ResponseStatus(HttpStatus.CREATED)
+    @FetchUserContext
+    IdDto<Long> createChat(
+            @RequestBody @Validated CreateGroupChatRequest createGroupChatRequest
+    ) {
+        return chatService.createGroupChat(createGroupChatRequest, UserContextHolder.getContext());
+    }
+
+    @DeleteMapping("{chatId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(description = "Delete a private chat", responses = {
             @ApiResponse(responseCode = "204", description = "Chat deleted")
     })
     @FetchUserContext
-    void deletePrivateChat(
+    void deleteChat(
             @PathVariable Long chatId
     ) {
-        chatService.deletePrivateChat(chatId);
+        chatService.deleteChat(chatId, UserContextHolder.getContext());
     }
 
     @PostMapping("{id}/avatar")
@@ -56,11 +66,31 @@ public class ChatController {
 
     @DeleteMapping("{id}/avatar/{fileId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void uploadAvatar(
+    @Operation(description = "Delete avatar of chat by file id and chat id")
+    void deleteAvatar(
             @PathVariable Long id,
             @PathVariable Long fileId
     ) {
         this.chatService.deleteAvatar(fileId, id);
     }
 
+    @PostMapping("{id}/invite/{userId}")
+    @Operation(description = "Invite member to chat")
+    @FetchUserContext
+    void inviteUser(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ) {
+        chatService.processUserInvitation(userId, id, UserContextHolder.getContext());
+    }
+
+    @FetchUserContext
+    @Operation(description = "Delete member f")
+    @PostMapping("{id}/block/{userId}")
+    void deleteUserFromChat(
+            @PathVariable Long id,
+            @PathVariable Long userId
+    ){
+        chatService.deleteChatMember(userId, id, UserContextHolder.getContext());
+    }
 }

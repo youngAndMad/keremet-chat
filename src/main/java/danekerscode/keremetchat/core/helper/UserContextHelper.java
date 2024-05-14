@@ -1,10 +1,13 @@
 package danekerscode.keremetchat.core.helper;
 
+import danekerscode.keremetchat.core.mapper.UserMapper;
+import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,12 +15,20 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Supplier;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class UserContextHelper {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final BeanFactory beanFactory;
+
+    // please never do this
+    // simple way to avoid @Cacheable self-invocation
+    private final Supplier<UserContextHelper> self = () -> beanFactory.getBean(this.getClass());
 
     @Cacheable(value = "userPrincipal", key = "#authentication.principal")
     public User extractUser(Authentication authentication) {
@@ -48,6 +59,10 @@ public class UserContextHelper {
 
 
         throw new RuntimeException("Not supported authentication type for user extraction %s".formatted(currentAuthPrincipal.getClass().getName()));
+    }
+
+    public UserResponseDto asResponseDto(Authentication authentication) {
+        return userMapper.toResponseDto(self.get().extractUser(authentication));
     }
 
 

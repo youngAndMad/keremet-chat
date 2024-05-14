@@ -4,7 +4,6 @@ import io.swagger.v3.oas.models.info.Info;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -47,7 +46,6 @@ public class AppProperties {
 
     @Data
     public static class SecurityConfig{
-
         private Admin defaultAdmin;
 
         @Data

@@ -13,5 +13,4 @@
     <include file="db/changelog/changeset/db.changelog-1.6-create-message-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.7-create-shedlock-table.sql"/>
     <include file="/db/changelog/changeset/db.changelog-1.8-create-table-chat-notification.sql"/>
-    <include file="db/changelog/changeset/db.changelog-1.9-create-user-notification-state-table.sql"/>
 </databaseChangeLog>
