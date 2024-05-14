@@ -45,11 +45,12 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
         jdbc.sql("""
                         insert into chat_notification(created_date, inner_id, chat_id, notification_time, type, content)
                         values (
-                        :createdTime, COALESCE((select max(inner_id) from chat_notification where chat_id=:chatId), 0) + 1,
+                        :createdTime,:innerId,
                         :chatId, :notificationTime, :type, :content);
                         """)
                 .param("createdTime", now)
                 .param("chatId", chatId)
+                .param("innerId", this.lastNotificationInnerId(chatId))
                 .param("notificationTime", now)
                 .param("type", request.type().name())
                 .param("content", null)
@@ -65,5 +66,13 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
         jdbc.sql("delete from chat_notification where chat_id = :chatId")
                 .param("chatId", chatId)
                 .update();
+    }
+
+    @Override
+    public Long lastNotificationInnerId(Long chatId) {
+        return (Long) jdbc.sql("select COALESCE((select max(inner_id) from chat_notification where chat_id=:chatId), 0) + 1")
+                .param("chatId", chatId)
+                .query()
+                .singleValue();
     }
 }

@@ -14,4 +14,6 @@ public interface ChatNotificationService {
 
     void cascadeForChat(Long chatId);
 
+    Long lastNotificationInnerId(Long chatId);
+
 }

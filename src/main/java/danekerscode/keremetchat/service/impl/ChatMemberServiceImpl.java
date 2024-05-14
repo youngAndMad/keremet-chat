@@ -7,6 +7,7 @@ import danekerscode.keremetchat.model.enums.ChatUserRole;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.repository.ChatMemberRepository;
 import danekerscode.keremetchat.service.ChatMemberService;
+import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,14 @@ public class ChatMemberServiceImpl implements ChatMemberService {
 
     private final ChatMemberRepository chatMemberRepository;
     private final ChatService chatService;
+    private final ChatNotificationService chatNotificationService;
 
-    public ChatMemberServiceImpl(ChatMemberRepository chatMemberRepository, @Lazy ChatService chatService) {
+    public ChatMemberServiceImpl(ChatMemberRepository chatMemberRepository,
+                                 @Lazy ChatService chatService,
+                                 ChatNotificationService chatNotificationService) {
         this.chatMemberRepository = chatMemberRepository;
         this.chatService = chatService;
+        this.chatNotificationService = chatNotificationService;
     }
 
     @Override
@@ -31,12 +36,8 @@ public class ChatMemberServiceImpl implements ChatMemberService {
         chatMember.setUser(user);
         chatMember.setRole(chatUserRole);
         chatMember.setChat(chat);
+        chatMember.setLastReceivedNotificationId(chatNotificationService.lastNotificationInnerId(chat.getId()));
         return chatMemberRepository.save(chatMember);
-    }
-
-    @Override
-    public Optional<Long> findByChatIdAndUserId(Long chatId, Long userId) {
-        return Optional.ofNullable(chatMemberRepository.findByChatIdAndUserId(chatId, userId));
     }
 
     @Override

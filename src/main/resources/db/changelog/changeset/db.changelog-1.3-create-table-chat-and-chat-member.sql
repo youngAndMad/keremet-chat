@@ -20,6 +20,7 @@ CREATE TABLE chat_member
     user_id            BIGINT,
     role               VARCHAR(255),
     chat_id            BIGINT,
+    last_received_notification_id BIGINT,
     foreign key (user_id) references users (id),
     foreign key (chat_id) references chat (id)
 );

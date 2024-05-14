@@ -1,5 +1,6 @@
 server:
   error:
+    include-message: always
     include-stacktrace: never
   servlet:
     session:
@@ -16,9 +17,6 @@ logging:
       security: trace
 
 spring:
-  mvc:
-    problemdetails:
-      enabled: true
   main:
     banner-mode: off
   jackson:
