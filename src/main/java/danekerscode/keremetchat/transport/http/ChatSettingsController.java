@@ -8,14 +8,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat/settings")
 @Tag(name = "Chat settings")
+@RestController
 public class ChatSettingsController {
 
     private final ChatSettingsService chatSettingsService;
@@ -33,7 +31,7 @@ public class ChatSettingsController {
     @Operation(description = "Reset chat settings to default")
     @FetchUserContext
     @PutMapping("default/{chatId}")
-    void resetToDefault(@PathVariable Long chatId){
+    void resetToDefault(@PathVariable Long chatId) {
         chatSettingsService.setDefaultForChat(chatId, UserContextHolder.getContext());
     }
 

@@ -16,15 +16,17 @@ public class MinioConfig {
     MinioClient minioClient(
             AppProperties appProperties
     ){
+        var minio = appProperties.getMinio();
+
         var minioClient = MinioClient.builder()
-                .endpoint(appProperties.getMinio().getUrl())
+                .endpoint(minio.getUrl())
                 .credentials(
-                        appProperties.getMinio().getAccessKey(),
-                        appProperties.getMinio().getSecretKey()
+                        minio.getAccessKey(),
+                        minio.getSecretKey()
                 )
                 .build();
 
-        log.info("Minio client created: Url: {}", appProperties.getMinio().getUrl());
+        log.info("Minio client created: Url: {}", minio.getUrl());
         return minioClient;
     }
 }

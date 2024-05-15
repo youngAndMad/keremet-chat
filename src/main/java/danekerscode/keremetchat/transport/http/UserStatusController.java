@@ -4,6 +4,7 @@ import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.model.dto.response.CountResponse;
 import danekerscode.keremetchat.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController("httpUserStatusController")
 @RequiredArgsConstructor
+@Tag(name="User status")
 @RequestMapping("api/v1/user/status")
 public class UserStatusController {
 

@@ -8,9 +8,11 @@ import danekerscode.keremetchat.model.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface AuthService {
 
-    UserResponseDto register(RegistrationRequest request);
+    CompletableFuture<UserResponseDto> register(RegistrationRequest request);
     
     UserResponseDto getCurrentUser();
 

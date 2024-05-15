@@ -5,15 +5,20 @@ import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.exception.Oauth2ProcessingException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.lang.NonNull;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandlerAdvice {
+public class GlobalExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
     @PostConstruct
     void postConstruct() {
@@ -48,5 +53,27 @@ public class GlobalExceptionHandlerAdvice {
                 HttpStatus.UNAUTHORIZED,
                 e.getMessage()
         ), HttpStatus.UNAUTHORIZED);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            @NonNull MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request
+    ) {
+        var problemDetail = ProblemDetail
+                .forStatusAndDetail(
+                        HttpStatusCode.valueOf(404),
+                        collectBindingErrors(ex.getBindingResult())
+                );
+        return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
+    }
+
+    private String collectBindingErrors(BindingResult br) {
+        return br.getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField() + "-" + fieldError.getDefaultMessage())
+                .collect(Collectors.joining());
     }
 }

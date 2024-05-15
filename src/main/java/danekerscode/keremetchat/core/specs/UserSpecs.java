@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 
 /**
- * Utility class to generate specifications from passed criteria\
+ * Utility class to generate specifications from passed criteria
  * @author youngAndMad
  */
 @UtilityClass

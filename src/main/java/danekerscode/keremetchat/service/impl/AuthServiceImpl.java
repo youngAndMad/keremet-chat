@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -58,27 +59,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserResponseDto register(RegistrationRequest request) {
-        var user = this.registerUser(request, SecurityRoleType.ROLE_USER);
-        var verificationTokenValue = randomString.get();
+    public CompletableFuture<UserResponseDto> register(RegistrationRequest request) {
+        return CompletableFuture.supplyAsync(() -> this.registerUser(request, SecurityRoleType.ROLE_USER))
+                .thenCompose(user -> {
+            var verificationTokenValue = randomString.get();
 
-        var sendMailArgs = SendMailArgs.builder()
-                .type(MailMessageType.GREETING)
-                .properties(Map.of(
-                        "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
-                        "receiverEmail", user.getEmail(),
-                        "verificationTokenTtl", appProperties.getMail().getVerificationTokenTtl().toString()
-                ))
-                .receiverEmail(user.getEmail())
-                .build();
+            var sendMailArgs = SendMailArgs.builder()
+                    .type(MailMessageType.GREETING)
+                    .properties(Map.of(
+                            "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
+                            "receiverEmail", user.getEmail(),
+                            "verificationTokenTtl", appProperties.getMail().getVerificationTokenTtl().toString().replaceAll("PT", "")
+                    ))
+                    .receiverEmail(user.getEmail())
+                    .build();
 
-        mailService.sendMail(sendMailArgs)
-                .thenRunAsync(() ->
-                                verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue),
-                        executor
-                );
+            var tokenSavedFuture = CompletableFuture.runAsync(() ->
+                    verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue), executor
+            );
 
-        return userMapper.toResponseDto(user);
+            return CompletableFuture.allOf(mailService.sendMail(sendMailArgs), tokenSavedFuture)
+                    .thenApply((_void) -> user);
+        }).thenApply(userMapper::toResponseDto);
+
+
     }
 
     protected User registerUser(

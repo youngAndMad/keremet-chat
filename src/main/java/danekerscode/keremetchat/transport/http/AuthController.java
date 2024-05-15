@@ -1,28 +1,27 @@
 package danekerscode.keremetchat.transport.http;
 
 import danekerscode.keremetchat.core.annotation.FetchUserContext;
-import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
-import danekerscode.keremetchat.model.entity.User;
-import danekerscode.keremetchat.model.exception.Oauth2ProcessingException;
 import danekerscode.keremetchat.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @RequiredArgsConstructor
-@Validated
 @Tag(name = "Auth")
 @RequestMapping("api/v1/auth")
 public class AuthController {
@@ -33,7 +32,7 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "User registered")
     })
     @ResponseStatus(HttpStatus.CREATED)
-    UserResponseDto register(@RequestBody RegistrationRequest request) {
+    CompletableFuture<UserResponseDto> register(@RequestBody @Valid RegistrationRequest request) {
         return authService.register(request);
     }
 
