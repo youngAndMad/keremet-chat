@@ -45,7 +45,7 @@ public class AuthController {
     })
     UserResponseDto registerManager(
             @RequestBody RegistrationRequest request
-    ){
+    ) {
         return authService.registerManager(request);
     }
 
@@ -70,10 +70,11 @@ public class AuthController {
         return authService.login(loginRequest, request, response);
     }
 
-    @Operation()
-    @PostMapping("email/verify/{token}")// todo add to white list for security config
-    void emailVerification(@PathVariable String token){
-        // todo
+    @Operation(description = "Verify email by token which sent to mail of user")
+// todo add to white list for security config
+    @PostMapping("email/verify/{token}")
+    void emailVerification(@PathVariable String token) {
+        authService.verifyEmailByToken(token);
     }
 
     @PostMapping("reset-password")

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,12 +39,12 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
     }
 
     @Override
-    public void deleteByValue(String verificationTokenValue) {
-        verificationTokenRepository.deleteByValue(verificationTokenValue);
+    public void clearForUserAndType(User user, VerificationTokenType type) {
+        verificationTokenRepository.deleteAllByTypeAndUserId(type, user.getId());
     }
 
     @Override
-    public void clearForUserAndType(User user, VerificationTokenType type) {
-        verificationTokenRepository.deleteAllByTypeAndUserId(type, user.getId());
+    public Optional<VerificationToken> findByValueAndType(String value, VerificationTokenType type) {
+        return verificationTokenRepository.findByValueAndType(value,type);
     }
 }

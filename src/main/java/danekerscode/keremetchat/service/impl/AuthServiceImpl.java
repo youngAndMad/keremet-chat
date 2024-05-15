@@ -14,7 +14,6 @@ import danekerscode.keremetchat.model.enums.MailMessageType;
 import danekerscode.keremetchat.model.enums.VerificationTokenType;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
-import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.CustomUserDetails;
 import danekerscode.keremetchat.service.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,9 +29,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final AppProperties appProperties;
     private final SecurityContextRepository securityContextRepository;
     private final AuthenticationManager authenticationManager;
@@ -52,8 +53,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
+    private final ExecutorService executor;
     private final Supplier<String> randomString = UUID.randomUUID()::toString;
-    ;
 
     @Override
     @Transactional
@@ -73,7 +74,8 @@ public class AuthServiceImpl implements AuthService {
 
         mailService.sendMail(sendMailArgs)
                 .thenRunAsync(() ->
-                        verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue)
+                                verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue),
+                        executor
                 );
 
         return userMapper.toResponseDto(user);
@@ -83,13 +85,13 @@ public class AuthServiceImpl implements AuthService {
             RegistrationRequest registrationRequest,
             SecurityRoleType... roles
     ) {
-        var userIsExistByEmail = userRepository.existsByEmail(registrationRequest.email());
+        var userIsExistByEmail = userService.existsByEmail(registrationRequest.email());
 
         if (userIsExistByEmail) {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
         }
 
-        var userIsExistByUsername = userRepository.existsByUsername(registrationRequest.username());
+        var userIsExistByUsername = userService.existsByUsername(registrationRequest.username());
 
         if (userIsExistByUsername) {
             throw new AuthProcessingException("User with this email already exists", HttpStatus.BAD_REQUEST);
@@ -104,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
         mappedUser.setAuthType(authTypeService.getOrCreateByName(AppConstants.MANUAL_AUTH_TYPE.getValue()));
         mappedUser.setRoles(userSecurityRoles);
 
-        return userRepository.save(mappedUser);
+        return userService.save(mappedUser);
     }
 
     @Override
@@ -149,7 +151,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         currentUser.setPassword(passwordEncoder.encode(resetPasswordRequest.newPassword()));
-        userRepository.save(currentUser);
+        userService.save(currentUser);
     }
 
     @Override
@@ -157,6 +159,30 @@ public class AuthServiceImpl implements AuthService {
     public UserResponseDto registerManager(RegistrationRequest request) {
         var registerManager = this.registerUser(request, SecurityRoleType.ROLE_APPLICATION_MANAGER, SecurityRoleType.ROLE_USER);
         return userMapper.toResponseDto(registerManager);
+    }
+
+    @Override
+    public void verifyEmailByToken(String verificationTokenValue) {
+        var verificationToken = verificationTokenService.findByValueAndType(verificationTokenValue, VerificationTokenType.MAIL_VERIFICATION)
+                .orElseThrow(() -> new AuthProcessingException("Invalid email verification token passed", HttpStatus.UNAUTHORIZED));
+
+        if (verificationToken.getExpirationDate().isAfter(LocalDateTime.now())) {
+            log.warn(
+                    "Email verification failed for user {}, verification token has been expired at {}",
+                    verificationToken.getUser().getEmail(),
+                    verificationToken.getExpirationDate()
+            );
+            throw new AuthProcessingException("Verification token has been expired at %s"
+                    .formatted(verificationToken.getExpirationDate().toString()), HttpStatus.BAD_REQUEST
+            );
+        }
+
+        var user = verificationToken.getUser();
+        user.setEmailConfirmed(true);
+        userService.save(user);
+
+        verificationTokenService.clearForUserAndType(user, VerificationTokenType.MAIL_VERIFICATION);
+        log.info("Successfully confirmed email {}", user.getEmail());
     }
 
 }

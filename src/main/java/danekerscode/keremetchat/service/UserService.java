@@ -27,4 +27,7 @@ public interface UserService {
 
     User findById(Long userId);
 
+    User save(User user);
+
+    boolean existsByUsername(String username);
 }

@@ -13,6 +13,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.Assert;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -28,7 +29,6 @@ public class MailServiceImpl implements MailService {
     public CompletableFuture<Void> sendMail(SendMailArgs args) {
         return CompletableFuture.runAsync(() -> {
             var msg = mailSender.createMimeMessage();
-
             try {
                 var helper = new MimeMessageHelper(
                         msg,
@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService {
                 Assert.notNull(args.getType(), "Type of mail message can not be null");
 
                 var template = ftl.getTemplate(args.getType().getTemplateName());
-                var html = FreeMarkerTemplateUtils.processTemplateIntoString(template, args.getProperties());
+                var html = FreeMarkerTemplateUtils.processTemplateIntoString(template, new HashMap<>(args.getProperties()));
 
                 helper.setText(html, true);
                 helper.setTo(args.getReceiverEmail());

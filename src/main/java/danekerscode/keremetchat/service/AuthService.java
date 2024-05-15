@@ -19,4 +19,6 @@ public interface AuthService {
     void resetPassword(ResetPasswordRequest resetPasswordRequest);
 
     UserResponseDto registerManager(RegistrationRequest request);
+
+    void verifyEmailByToken(String verificationToken);
 }

@@ -28,4 +28,7 @@ public interface UserRepository extends CommonRepository<User, Long>,
     @Modifying
     @Query("DELETE User u where u.isActive=false")
     int deleteAllByActiveFalse();
+
+
+
 }
