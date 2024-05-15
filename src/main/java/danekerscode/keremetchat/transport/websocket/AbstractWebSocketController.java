@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -35,7 +37,6 @@ public class AbstractWebSocketController {
         return userContextHelper.asResponseDto(auth);
     }
 
-
     protected List<Long> findChatMemberUsersId(Long chatId) {
         return this.chatMemberService.findChatMemberUsersId(chatId);
     }
@@ -44,5 +45,14 @@ public class AbstractWebSocketController {
         return this.userStatusService.getUserActivity(userId);
     }
 
-
+    protected <T extends Serializable> void deliverWebSocketMessage(
+            T data,
+            WebSocketDestination webSocketDestination,
+            Long... receiverUsers
+    ) {
+        Arrays.stream(receiverUsers)
+                .forEach(userId ->
+                        webSocketMessagingHelper.deliver(data, webSocketDestination.forUser(userId))
+                );
+    }
 }

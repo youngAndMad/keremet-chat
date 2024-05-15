@@ -3,6 +3,7 @@ package danekerscode.keremetchat.service.impl;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.model.notification.ChatNotification;
 import danekerscode.keremetchat.model.notification.CommonChatNotificationRequest;
+import danekerscode.keremetchat.model.notification.CommonStopChatNotificationRequest;
 import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,11 @@ import java.util.Objects;
 @Service
 @Slf4j
 public class ChatNotificationServiceImpl implements ChatNotificationService {
-
+    // todo move jdbc logic to repository layer
     private final JdbcClient jdbc;
     private final ChatService chatService;
 
-    public ChatNotificationServiceImpl(JdbcClient jdbc,@Lazy ChatService chatService) {
+    public ChatNotificationServiceImpl(JdbcClient jdbc, @Lazy ChatService chatService) {
         this.jdbc = jdbc;
         this.chatService = chatService;
     }
@@ -47,10 +48,10 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
         var idKeyHolder = new GeneratedKeyHolder();
         var now = LocalDateTime.now();
         jdbc.sql("""
-                        insert into chat_notification(created_date, inner_id, chat_id, notification_time, type, content)
+                        insert into chat_notification(created_date, inner_id, chat_id, notification_time, type, content,sender_id)
                         values (
                         :createdTime,:innerId,
-                        :chatId, :notificationTime, :type, :content);
+                        :chatId, :notificationTime, :type, :content, :senderId);
                         """)
                 .param("createdTime", now)
                 .param("chatId", chatId)
@@ -58,6 +59,7 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
                 .param("notificationTime", now)
                 .param("type", request.type().name())
                 .param("content", null)
+                .param("senderId", member.getId())
                 .update(idKeyHolder, "id"); //todo: move to repository layer
 
         var id = Objects.requireNonNull(idKeyHolder.getKey()).longValue();
@@ -78,5 +80,33 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
                 .param("chatId", chatId)
                 .query()
                 .singleValue();
+    }
+
+    @Override
+    public void deleteNotification(
+            CommonStopChatNotificationRequest request,
+            UserResponseDto currentUser,
+            Long chatId
+    ) {
+        var chat = chatService.findById(chatId);
+        var currentMember = chat.memberForUser(currentUser.id());
+
+        var affectedRows = jdbc.sql("""
+                        delete from chat_notification
+                        where chat_id = :chatId
+                        and sender_id =: senderId
+                        and type =: type
+                        """)
+                .param("chatId", chatId)
+                .param("senderId", currentMember.getId())
+                .param("type", request.type().name())
+                .update();
+
+        log.debug("Deleted notifications by sender user {}, chatId {} type {} affected rows {}",
+                currentUser.email(),
+                chat.getId(),
+                request.type(),
+                affectedRows
+        );
     }
 }

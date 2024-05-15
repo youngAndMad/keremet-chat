@@ -26,4 +26,5 @@ public interface UserService {
     int deleteInactiveUsers();
 
     User findById(Long userId);
+
 }

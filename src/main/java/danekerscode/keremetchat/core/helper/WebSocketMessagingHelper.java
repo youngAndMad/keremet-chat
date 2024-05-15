@@ -7,7 +7,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.io.Serializable;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -16,34 +16,23 @@ public class WebSocketMessagingHelper {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    private void deliver(
-            Object data,
-            WebSocketDestination webSocketDestination,
-            Long destinationIdentifier
+    public <T extends Serializable> void deliver(
+            T data,
+            String webSocketDestination
     ) {
         try {
-            simpMessagingTemplate.convertAndSend(webSocketDestination.getDestination(), data);
+            simpMessagingTemplate.convertAndSend(webSocketDestination, data);
 
             log.info(
-                    "successfully delivered websocket message to {} with destination {}",
-                    destinationIdentifier,
-                    webSocketDestination.getDestination()
+                    "successfully delivered websocket message with destination {}",
+                    webSocketDestination
             );
 
         } catch (MessagingException messagingException) {
             log.error("error during message delivering to {} ",
-                    String.format("destinationIdentifier %d, destination %s", destinationIdentifier, webSocketDestination.getDestination()),
+                    String.format("destination %s", webSocketDestination),
                     messagingException
             );
         }
-    }
-
-    public void deliver(
-            Object data,
-            WebSocketDestination webSocketDestination,
-            Long... destinationIdentifiers
-    ) {
-        Arrays.stream(destinationIdentifiers)
-                .forEach(destinationIdentifier -> this.deliver(data, webSocketDestination, destinationIdentifier));
     }
 }
