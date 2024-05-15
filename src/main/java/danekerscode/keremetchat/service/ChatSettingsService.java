@@ -7,4 +7,5 @@ public interface ChatSettingsService {
 
     void updateSettingsFor(Long chatId, ChatSettingsDto chatSettingsDto, User currentUser);
 
+    void setDefaultForChat(Long id,User currentUser);
 }

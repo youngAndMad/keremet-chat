@@ -24,14 +24,13 @@ public class User extends BaseEntity implements Serializable {
     @JsonIgnore
     private String password;
     @ManyToOne
-    @JoinColumn(name = "auth_type_id", referencedColumnName = "id")
     private AuthType authType;
     private boolean isActive = true;
 
     @ManyToMany
     @JoinTable(
             name = "users_security_roles",
-            inverseJoinColumns = @JoinColumn(name = "security_role_id", referencedColumnName = "id")
+            inverseJoinColumns = @JoinColumn(name = "security_role_id")
     )
     private Set<SecurityRole> roles;
 

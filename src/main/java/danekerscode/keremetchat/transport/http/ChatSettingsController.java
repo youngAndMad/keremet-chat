@@ -30,4 +30,12 @@ public class ChatSettingsController {
         chatSettingsService.updateSettingsFor(chatId, chatSettingsDto, UserContextHolder.getContext());
     }
 
+    @Operation(description = "Reset chat settings to default")
+    @FetchUserContext
+    @PutMapping("default/{chatId}")
+    void resetToDefault(@PathVariable Long chatId){
+        chatSettingsService.setDefaultForChat(chatId, UserContextHolder.getContext());
+    }
+
+
 }

@@ -67,26 +67,23 @@ public class JdbcUtils {
     public static ClientRegistration mapToClientRegistration(
             ResultSet rs
     ) throws SQLException {
-        var scopes = StringUtils.commaDelimitedListToSet(rs.getString("scopes"));
-        var builder = ClientRegistration.withRegistrationId(rs.getString("registration_id"))
+        return ClientRegistration.withRegistrationId(rs.getString("registration_id"))
                 .clientId(rs.getString("client_id"))
                 .clientSecret(rs.getString("client_secret"))
                 .clientAuthenticationMethod(Oauth2Utils.resolveClientAuthenticationMethod(rs.getString("client_authentication_method")))
                 .authorizationGrantType(Oauth2Utils.resolveAuthorizationGrantType(rs.getString("authorization_grant_type")))
                 .clientName(rs.getString("client_name"))
                 .redirectUri(rs.getString("redirect_uri"))
-                .scope(scopes)
+                .scope(StringUtils.commaDelimitedListToSet(rs.getString("scopes")))
                 .authorizationUri(rs.getString("authorization_uri"))
                 .tokenUri(rs.getString("token_uri"))
                 .jwkSetUri(rs.getString("jwk_set_uri"))
                 .issuerUri(rs.getString("issuer_uri"))
+                .providerConfigurationMetadata(ObjectMapperUtils.parseMap(rs.getString("configuration_metadata")))
                 .userInfoUri(rs.getString("user_info_uri"))
                 .userInfoAuthenticationMethod(Oauth2Utils.resolveUserInfoAuthenticationMethod(rs.getString("user_info_authentication_method")))
-                .userNameAttributeName(rs.getString("user_name_attribute_name"));
-
-        var configurationMetadata = ObjectMapperUtils.parseMap(rs.getString("configuration_metadata"));
-        builder.providerConfigurationMetadata(configurationMetadata);
-        return builder.build();
+                .userNameAttributeName(rs.getString("user_name_attribute_name"))
+                .build();
     }
 
     private static String toSnakeCase(String str) {
