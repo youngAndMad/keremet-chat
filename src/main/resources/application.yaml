@@ -17,6 +17,17 @@ logging:
       security: trace
 
 spring:
+  mail:
+    host: ${SMTP_HOST}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    port: 587
   main:
     banner-mode: off
   jackson:
@@ -83,6 +94,10 @@ app:
       version: v0.0.1-SNAPSHOT
   websocket:
     allowed-origins: 'http://localhost:5173/'
+  mail:
+    verification-token-ttl: 3m
+    sender: no-reply@keremet-chat.com
+    verification-link-pattern: 'http://localhost:5173/auth/mail/confirmation/%s' # todo create react component to handle it
   security:
     delete-inactive-users: false
     delete-inactive-users-cron: '0 0 0 * * *' # every day at midnight

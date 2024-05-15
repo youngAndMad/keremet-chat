@@ -1,20 +1,22 @@
 package danekerscode.keremetchat.service.impl;
 
+import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
 import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.core.mapper.UserMapper;
+import danekerscode.keremetchat.model.dto.SendMailArgs;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
 import danekerscode.keremetchat.model.dto.request.RegistrationRequest;
 import danekerscode.keremetchat.model.dto.request.ResetPasswordRequest;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
-import danekerscode.keremetchat.model.entity.SecurityRole;
+import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.MailMessageType;
+import danekerscode.keremetchat.model.enums.VerificationTokenType;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import danekerscode.keremetchat.model.exception.AuthProcessingException;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.security.CustomUserDetails;
-import danekerscode.keremetchat.service.AuthService;
-import danekerscode.keremetchat.service.AuthTypeService;
-import danekerscode.keremetchat.service.SecurityRoleService;
+import danekerscode.keremetchat.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,20 +42,44 @@ import java.util.stream.Collectors;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final AppProperties appProperties;
     private final SecurityContextRepository securityContextRepository;
     private final AuthenticationManager authenticationManager;
     private final AuthTypeService authTypeService;
     private final SecurityRoleService securityRoleService;
+    private final MailService mailService;
+    private final VerificationTokenService verificationTokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+
+    private final Supplier<String> randomString = UUID.randomUUID()::toString;
+    ;
 
     @Override
     @Transactional
     public UserResponseDto register(RegistrationRequest request) {
-        return this.registerUser(request,SecurityRoleType.ROLE_USER);
+        var user = this.registerUser(request, SecurityRoleType.ROLE_USER);
+        var verificationTokenValue = randomString.get();
+
+        var sendMailArgs = SendMailArgs.builder()
+                .type(MailMessageType.GREETING)
+                .properties(Map.of(
+                        "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
+                        "receiverEmail", user.getEmail(),
+                        "verificationTokenTtl", appProperties.getMail().getVerificationTokenTtl().toString()
+                ))
+                .receiverEmail(user.getEmail())
+                .build();
+
+        mailService.sendMail(sendMailArgs)
+                .thenRunAsync(() ->
+                        verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue)
+                );
+
+        return userMapper.toResponseDto(user);
     }
 
-    protected UserResponseDto registerUser(
+    protected User registerUser(
             RegistrationRequest registrationRequest,
             SecurityRoleType... roles
     ) {
@@ -74,7 +103,8 @@ public class AuthServiceImpl implements AuthService {
 
         mappedUser.setAuthType(authTypeService.getOrCreateByName(AppConstants.MANUAL_AUTH_TYPE.getValue()));
         mappedUser.setRoles(userSecurityRoles);
-        return userMapper.toResponseDto(userRepository.save(mappedUser));
+
+        return userRepository.save(mappedUser);
     }
 
     @Override
@@ -125,7 +155,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public UserResponseDto registerManager(RegistrationRequest request) {
-        return this.registerUser(request,SecurityRoleType.ROLE_APPLICATION_MANAGER,SecurityRoleType.ROLE_USER);
+        var registerManager = this.registerUser(request, SecurityRoleType.ROLE_APPLICATION_MANAGER, SecurityRoleType.ROLE_USER);
+        return userMapper.toResponseDto(registerManager);
     }
 
 }

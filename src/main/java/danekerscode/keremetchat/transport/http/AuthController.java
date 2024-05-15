@@ -70,11 +70,11 @@ public class AuthController {
         return authService.login(loginRequest, request, response);
     }
 
-    @GetMapping("login")
-    String test(){
-        throw new Oauth2ProcessingException("err");
+    @Operation()
+    @PostMapping("email/verify/{token}")// todo add to white list for security config
+    void emailVerification(@PathVariable String token){
+        // todo
     }
-
 
     @PostMapping("reset-password")
     @Operation(description = "Reset password", responses = {

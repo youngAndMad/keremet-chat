@@ -1,12 +1,14 @@
 package danekerscode.keremetchat.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import danekerscode.keremetchat.model.enums.VerificationTokenType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,6 +28,11 @@ public class User extends BaseEntity implements Serializable {
     @ManyToOne
     private AuthType authType;
     private boolean isActive = true;
+
+    private Boolean emailConfirmed;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<VerificationToken> verificationTokens;
 
     @ManyToMany
     @JoinTable(
