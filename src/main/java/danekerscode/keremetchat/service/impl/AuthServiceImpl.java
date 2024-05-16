@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -62,25 +63,25 @@ public class AuthServiceImpl implements AuthService {
     public CompletableFuture<UserResponseDto> register(RegistrationRequest request) {
         return CompletableFuture.supplyAsync(() -> this.registerUser(request, SecurityRoleType.ROLE_USER))
                 .thenCompose(user -> {
-            var verificationTokenValue = randomString.get();
+                    var verificationTokenValue = randomString.get();
 
-            var sendMailArgs = SendMailArgs.builder()
-                    .type(MailMessageType.GREETING)
-                    .properties(Map.of(
-                            "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
-                            "receiverEmail", user.getEmail(),
-                            "verificationTokenTtl", appProperties.getMail().getVerificationTokenTtl().toString().replaceAll("PT", "")
-                    ))
-                    .receiverEmail(user.getEmail())
-                    .build();
+                    var sendMailArgs = SendMailArgs.builder()
+                            .type(MailMessageType.GREETING)
+                            .properties(Map.of(
+                                    "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
+                                    "receiverEmail", user.getEmail(),
+                                    "verificationTokenTtl", appProperties.getMail().getVerificationTokenTtl().toString().replaceAll("PT", "")
+                            ))
+                            .receiverEmail(user.getEmail())
+                            .build();
 
-            var tokenSavedFuture = CompletableFuture.runAsync(() ->
-                    verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue), executor
-            );
+                    var tokenSavedFuture = CompletableFuture.runAsync(() ->
+                            verificationTokenService.saveForUserWithType(user, VerificationTokenType.MAIL_VERIFICATION, verificationTokenValue), executor
+                    );
 
-            return CompletableFuture.allOf(mailService.sendMail(sendMailArgs), tokenSavedFuture)
-                    .thenApply((_void) -> user);
-        }).thenApply(userMapper::toResponseDto);
+                    return CompletableFuture.allOf(mailService.sendMail(sendMailArgs), tokenSavedFuture)
+                            .thenApply((_void) -> user);
+                }).thenApply(userMapper::toResponseDto);
 
 
     }
@@ -136,11 +137,7 @@ public class AuthServiceImpl implements AuthService {
                 loginRequest.email(), loginRequest.password()
         );
 
-        var authentication = authenticationManager.authenticate(passwordAuthenticationToken);
-        var securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(authentication);
-        securityContextRepository.saveContext(securityContext, request, response);
-
+        var authentication = this.authenticateAndCreateSession(passwordAuthenticationToken, request, response);
         var currentUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         return userMapper.toResponseDto(currentUserDetails.user());
@@ -166,8 +163,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verifyEmailByToken(String verificationTokenValue) {
-        var verificationToken = verificationTokenService.findByValueAndType(verificationTokenValue, VerificationTokenType.MAIL_VERIFICATION)
+    public void verifyEmailByToken(String verificationTokenValue, HttpServletRequest request, HttpServletResponse response) {
+        var verificationToken = verificationTokenService
+                .findByValueAndType(verificationTokenValue, VerificationTokenType.MAIL_VERIFICATION)
                 .orElseThrow(() -> new AuthProcessingException("Invalid email verification token passed", HttpStatus.UNAUTHORIZED));
 
         if (verificationToken.getExpirationDate().isAfter(LocalDateTime.now())) {
@@ -187,6 +185,27 @@ public class AuthServiceImpl implements AuthService {
 
         verificationTokenService.clearForUserAndType(user, VerificationTokenType.MAIL_VERIFICATION);
         log.info("Successfully confirmed email {}", user.getEmail());
+
+        var passwordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), user.getPassword()
+        );
+
+        this.authenticateAndCreateSession(passwordAuthenticationToken, request, response);
     }
+
+    private Authentication authenticateAndCreateSession(
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        var auth = authenticationManager.authenticate(authentication);
+        var securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(auth);
+        securityContextRepository.saveContext(securityContext, request, response);
+
+        log.info("Authenticated and created session for {}", auth.getName());
+        return auth;
+    }
+
 
 }

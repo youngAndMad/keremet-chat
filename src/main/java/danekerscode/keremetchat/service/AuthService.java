@@ -22,5 +22,5 @@ public interface AuthService {
 
     UserResponseDto registerManager(RegistrationRequest request);
 
-    void verifyEmailByToken(String verificationToken);
+    void verifyEmailByToken(String verificationToken, HttpServletRequest request, HttpServletResponse response);
 }

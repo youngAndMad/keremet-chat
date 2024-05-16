@@ -97,7 +97,7 @@ app:
   mail:
     verification-token-ttl: 3m
     sender: no-reply@keremet-chat.com
-    verification-link-pattern: 'http://localhost:5173/auth/mail/confirmation/%s' # todo create react component to handle it
+    verification-link-pattern: 'http://localhost:5173/auth/email/confirm?token=%s' # todo create react component to handle it
   security:
     delete-inactive-users: false
     delete-inactive-users-cron: '0 0 0 * * *' # every day at midnight
