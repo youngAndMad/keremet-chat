@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.common.annotation;
 
-import danekerscode.keremetchat.config.tc.MinioTestContainerInitializer;
+//import danekerscode.keremetchat.config.tc.MinioTestContainerInitializer;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.annotation.ElementType;
@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@ContextConfiguration(initializers = MinioTestContainerInitializer.class)
+//@ContextConfiguration(initializers = MinioTestContainerInitializer.class)
 public @interface EnableMinioContainer {
 }

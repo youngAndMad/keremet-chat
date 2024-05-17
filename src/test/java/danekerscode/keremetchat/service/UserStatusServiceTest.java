@@ -31,7 +31,8 @@ class UserStatusServiceTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(redisTemplate.opsForHash())
+        lenient()
+                .when(redisTemplate.opsForHash())
                 .thenReturn(hashOperations);
     }
 
