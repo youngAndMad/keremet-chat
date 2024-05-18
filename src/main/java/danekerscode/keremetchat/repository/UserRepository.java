@@ -1,6 +1,7 @@
 package danekerscode.keremetchat.repository;
 
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.repository.common.CommonRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,6 +30,5 @@ public interface UserRepository extends CommonRepository<User, Long>,
     @Query("DELETE User u where u.isActive=false")
     int deleteAllByActiveFalse();
 
-
-
+    boolean existsByUsernameAndProvider(String username, AuthType provider);
 }

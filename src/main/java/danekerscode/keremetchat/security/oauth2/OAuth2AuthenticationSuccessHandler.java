@@ -2,8 +2,8 @@ package danekerscode.keremetchat.security.oauth2;
 
 import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.repository.UserRepository;
-import danekerscode.keremetchat.service.AuthTypeService;
 import danekerscode.keremetchat.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,8 +23,8 @@ import java.io.IOException;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-    private final UserRepository userRepository;
-    private final AuthTypeService authTypeService;
+    private final UserRepository userRepository; // todo use user service
+    private final JdbcClientRegistrationRepository clientRegistrationRepository;
 
     @Override
     public void onAuthenticationSuccess(
@@ -33,26 +33,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             Authentication authentication
     ) throws IOException {
         if (authentication instanceof DefaultOAuth2User oAuth2User) {
-            var username = oAuth2User.getName();
-
-            if (userRepository.existsByUsername(username)) {
-                return;
-            }
-
-            var user = new User();
-            user.setAuthType(authTypeService.getOrCreateByName("github")); // todo extract registration id
-            user.setUsername(username);
-            userRepository.save(user);
+//            var username = oAuth2User.getName();
+//
+//            if (userRepository.existsByUsername(username)) {
+//                return;
+//            }
         }
 
         if (authentication instanceof OAuth2AuthenticationToken auth2AuthenticationToken) {
             var principal = auth2AuthenticationToken.getPrincipal();
             var username = principal.getName();
 
-            var user = new User();
-            user.setAuthType(authTypeService.getOrCreateByName(auth2AuthenticationToken.getAuthorizedClientRegistrationId())); // todo extract registration id
-            user.setUsername(username);
-            userRepository.save(user);
+            var provider = AuthType.fromCommonOauth2Provider(
+                    clientRegistrationRepository.getProviderName(auth2AuthenticationToken.getAuthorizedClientRegistrationId())
+            );
+            if (!userRepository.existsByUsernameAndProvider(username, provider)) {
+                var user = new User();
+                user.setProvider(provider);
+                user.setUsername(username);
+                userRepository.save(user);
+            }
         }
         var targetUrl = determineTargetUrl(request, response, authentication);
 
@@ -80,4 +80,5 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
+
 }

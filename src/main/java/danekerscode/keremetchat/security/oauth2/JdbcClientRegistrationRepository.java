@@ -114,7 +114,7 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
         );
     }
 
-    private CommonOAuth2Provider getProviderName(String registrationId) {
+    public CommonOAuth2Provider getProviderName(String registrationId) {
         return jdbcOperations.queryForObject(
                 "select provider_name from " + TABLE_NAME + " where registration_id = ?",
                 CommonOAuth2Provider.class,

@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.model.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import danekerscode.keremetchat.model.entity.AuthType;
+import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import danekerscode.keremetchat.model.projection.ChatMemberProjection;
 

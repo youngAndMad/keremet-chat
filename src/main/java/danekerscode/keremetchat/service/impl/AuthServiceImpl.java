@@ -2,7 +2,6 @@ package danekerscode.keremetchat.service.impl;
 
 import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.context.holder.UserContextHolder;
-import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.core.mapper.UserMapper;
 import danekerscode.keremetchat.model.dto.SendMailArgs;
 import danekerscode.keremetchat.model.dto.request.LoginRequest;
@@ -48,7 +47,6 @@ public class AuthServiceImpl implements AuthService {
     private final AppProperties appProperties;
     private final SecurityContextRepository securityContextRepository;
     private final AuthenticationManager authenticationManager;
-    private final AuthTypeService authTypeService;
     private final SecurityRoleService securityRoleService;
     private final MailService mailService;
     private final VerificationTokenService verificationTokenService;
@@ -108,7 +106,6 @@ public class AuthServiceImpl implements AuthService {
 
         var mappedUser = userMapper.registrationRequestToUser(registrationRequest, hashPassword);
 
-        mappedUser.setAuthType(authTypeService.getOrCreateByName(AppConstants.MANUAL_AUTH_TYPE.getValue()));
         mappedUser.setRoles(userSecurityRoles);
 
         return userService.save(mappedUser);

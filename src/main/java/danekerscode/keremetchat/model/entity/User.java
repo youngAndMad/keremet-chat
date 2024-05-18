@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import danekerscode.keremetchat.model.enums.VerificationTokenType;
+import danekerscode.keremetchat.model.enums.AuthType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +25,8 @@ public class User extends BaseEntity implements Serializable {
     private String username;
     @JsonIgnore
     private String password;
-    @ManyToOne
-    private AuthType authType;
+    @Enumerated(EnumType.STRING)
+    private AuthType provider;
     private boolean isActive = true;
 
     private Boolean emailConfirmed;

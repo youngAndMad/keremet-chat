@@ -14,7 +14,7 @@ import java.time.Duration;
 public class RedisConfig {
 
     private static final int CACHE_TTL = 10;
-    public static final GenericJackson2JsonRedisSerializer GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER
+    private static final GenericJackson2JsonRedisSerializer GENERIC_JACKSON_2_JSON_REDIS_SERIALIZER
             = new GenericJackson2JsonRedisSerializer();
 
     @Bean

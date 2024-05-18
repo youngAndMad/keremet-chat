@@ -12,4 +12,8 @@ public interface ChatMemberService {
     ChatMember forUserWithRole(User user, ChatUserRole chatUserRole, Chat chat);
 
     List<Long> findChatMemberUsersId(Long chatId);
+
+    ChatMember findByChatAndUser(Long chatId, Long userId);
+
+    void updateLastNotificationState(Long chatMemberId, Long updatedValue);
 }

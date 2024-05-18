@@ -39,17 +39,6 @@ public class CustomOidcUserService extends OidcUserService {
         User user = userRepository.findByEmail(email)
                 .orElseGet(User::new);
         user.setEmail(email);
-
-//        RoleType role = oidcUser.getAuthorities()
-//                .stream()
-//                .filter(authority -> RoleType.ROLE_USER.name()
-//                        .equals(authority.getAuthority()))
-//                .findFirst()
-//                .map(authority -> RoleType.valueOf(authority.getAuthority()))
-//                .get();
-//        user.setRole(role);
-
-
         userRepository.save(user);
     }
 

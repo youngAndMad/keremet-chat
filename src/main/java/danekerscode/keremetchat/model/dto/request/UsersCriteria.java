@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record UsersCriteria(
         LocalDateTime registeredTimeFrom,
         LocalDateTime registeredTimeTo,
-        String authType,
+        String provider,
         String keyword,
         Boolean isActive,
         SecurityRole role

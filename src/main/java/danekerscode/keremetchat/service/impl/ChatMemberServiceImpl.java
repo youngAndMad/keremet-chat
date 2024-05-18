@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
+import danekerscode.keremetchat.model.dto.KeyPair;
 import danekerscode.keremetchat.model.entity.Chat;
 import danekerscode.keremetchat.model.entity.ChatMember;
 import danekerscode.keremetchat.model.entity.User;
@@ -11,9 +12,9 @@ import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ChatMemberServiceImpl implements ChatMemberService {
@@ -49,6 +50,18 @@ public class ChatMemberServiceImpl implements ChatMemberService {
         }
 
         return chatMemberRepository.findChatMemberUsersId(chatId);
+    }
+
+    @Override
+    public ChatMember findByChatAndUser(Long chatId, Long userId) {
+        return chatMemberRepository.findByUserIdAndChatId(chatId, userId)
+                .orElseThrow(() -> new EntityNotFoundException(ChatMember.class, KeyPair.of("chatId", chatId), KeyPair.of("userId", userId)));
+    }
+
+    @Override
+    @Transactional
+    public void updateLastNotificationState(Long chatMemberId, Long updatedValue) {
+        chatMemberRepository.updateLastNotificationState(chatMemberId, updatedValue);
     }
 
 }

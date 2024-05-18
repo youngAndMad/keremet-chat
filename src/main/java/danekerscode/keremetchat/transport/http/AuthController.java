@@ -70,10 +70,11 @@ public class AuthController {
     }
 
     @Operation(description = "Verify email by token which sent to mail of user")
-// todo add to white list for security config
     @PostMapping("email/verify/{token}")
-    void emailVerification(@PathVariable String token) {
-        authService.verifyEmailByToken(token);
+    void emailVerification(@PathVariable String token,
+                           HttpServletRequest request,
+                           HttpServletResponse response) {
+        authService.verifyEmailByToken(token, request, response);
     }
 
     @PostMapping("reset-password")

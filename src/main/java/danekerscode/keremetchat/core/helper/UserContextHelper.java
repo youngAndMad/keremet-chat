@@ -31,9 +31,8 @@ public class UserContextHelper implements InitializingBean {
     // simple way to avoid @Cacheable self-invocation
     private Supplier<UserContextHelper> self;
 
-    @Override
-    // also we can use @PostConstruct
-    public void afterPropertiesSet() throws Exception {
+    @Override// also we can use @PostConstruct
+    public void afterPropertiesSet() {
         this.self = () -> beanFactory.getBean(this.getClass());
     }
 

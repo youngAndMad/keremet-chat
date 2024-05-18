@@ -1,7 +1,6 @@
 package danekerscode.keremetchat.core.specs;
 
 import danekerscode.keremetchat.model.dto.request.UsersCriteria;
-import danekerscode.keremetchat.model.entity.AuthType;
 import danekerscode.keremetchat.model.entity.BaseEntity;
 import danekerscode.keremetchat.model.entity.SecurityRole;
 import danekerscode.keremetchat.model.entity.User;
@@ -46,9 +45,8 @@ public class UserSpecs {
                 predicates.addAll(keywordPredicated);
             }
 
-            if (StringUtils.hasText(criteria.authType())) {
-                var authTypeJoin = root.join(User.Fields.authType, JoinType.LEFT);
-                predicates.add(cb.equal(authTypeJoin.get(AuthType.Fields.name), criteria.authType()));
+            if (StringUtils.hasText(criteria.provider())) {
+                predicates.add(cb.equal(root.get(User.Fields.provider), criteria.provider()));
             }
 
             if (criteria.registeredTimeFrom() != null){

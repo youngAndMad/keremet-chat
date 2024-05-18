@@ -1,10 +1,8 @@
 package danekerscode.keremetchat.model.projection;
 
-import danekerscode.keremetchat.model.entity.AuthType;
+import danekerscode.keremetchat.model.enums.AuthType;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

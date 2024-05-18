@@ -1,6 +1,9 @@
 package danekerscode.keremetchat.service.impl;
 
+import danekerscode.keremetchat.model.dto.KeyPair;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
+import danekerscode.keremetchat.model.enums.websocket.WebsocketNotificationType;
+import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.model.notification.ChatNotification;
 import danekerscode.keremetchat.model.notification.CommonChatNotificationRequest;
 import danekerscode.keremetchat.model.notification.CommonStopChatNotificationRequest;
@@ -8,6 +11,7 @@ import danekerscode.keremetchat.service.ChatNotificationService;
 import danekerscode.keremetchat.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
@@ -108,5 +112,19 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
                 request.type(),
                 affectedRows
         );
+    }
+
+    @Override
+    public ChatNotification findBySenderAndType(Long senderId, WebsocketNotificationType type) {
+        return jdbc.sql("""
+                        select * from chat_notification
+                        where type =: type
+                        and sender_id =: senderId
+                        """)
+                .param("senderId", senderId)
+                .param("type", type)
+                .query(new BeanPropertyRowMapper<>(ChatNotification.class))
+                .optional()
+                .orElseThrow(() -> new EntityNotFoundException(ChatNotification.class, KeyPair.of("senderId", senderId), KeyPair.of("type", type)));
     }
 }

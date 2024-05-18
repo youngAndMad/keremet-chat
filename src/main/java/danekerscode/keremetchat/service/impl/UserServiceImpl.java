@@ -1,15 +1,14 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.core.AppConstants;
 import danekerscode.keremetchat.core.mapper.UserMapper;
 import danekerscode.keremetchat.core.specs.UserSpecs;
 import danekerscode.keremetchat.model.dto.request.UsersCriteria;
 import danekerscode.keremetchat.model.dto.response.UserResponseDto;
 import danekerscode.keremetchat.model.entity.User;
+import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.model.enums.security.SecurityRoleType;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
 import danekerscode.keremetchat.repository.UserRepository;
-import danekerscode.keremetchat.service.AuthTypeService;
 import danekerscode.keremetchat.service.SecurityRoleService;
 import danekerscode.keremetchat.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private final AuthTypeService authTypeService;
     private final UserRepository userRepository;
     private final SecurityRoleService securityRoleService;
     private final PasswordEncoder passwordEncoder;
@@ -59,7 +57,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toSet());
 
         var user = new User();
-        user.setAuthType(authTypeService.getOrCreateByName(AppConstants.MANUAL_AUTH_TYPE.getValue()));
+        user.setProvider(AuthType.MANUAL);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setUsername(email);
@@ -72,24 +70,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id, User currentUser) {
+        checkUserExistent(id);
+        this.userRepository.deleteById(id);
+    }
+
+    private void checkUserExistent(Long id) {
         var userExists = this.userRepository.existsById(id);
 
         if (!userExists) {
             throw new EntityNotFoundException(User.class, id);
         }
-
-        this.userRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public void deactivateUser(Long id, User currentUser) {
-        var userExists = this.userRepository.existsById(id);
-
-        if (!userExists) {
-            throw new EntityNotFoundException(User.class, id);
-        }
-
+        checkUserExistent(id);
         this.userRepository.deactivateUser(id);
     }
 
