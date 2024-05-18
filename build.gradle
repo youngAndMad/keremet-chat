@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'danekerscode'
@@ -79,5 +80,8 @@ test {
 tasks.withType(JavaCompile).configureEach {
     options.annotationProcessorPath = configurations.annotationProcessor
     options.compilerArgs.add('-Amapstruct.defaultComponentModel=spring')
-    options.compilerArgs.add('-Amapstruct.verbose=true')
+}
+
+checkstyle{
+    toolVersion '10.16.0'
 }
