@@ -56,6 +56,7 @@ spring:
     database-change-log-lock-table: db_changelog_lock
     database-change-log-table: db_changelog
     change-log: db/changelog/db.changelog-master.xml
+    default-schema: keremet_chat
   security:
     oauth2:
       client:

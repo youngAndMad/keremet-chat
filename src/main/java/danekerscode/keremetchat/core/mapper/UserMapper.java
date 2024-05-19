@@ -20,7 +20,6 @@ public interface UserMapper {
     User registrationRequestToUser(RegistrationRequest request, String hashPassword);
 
     @Mapping(target = "roles", expression = "java(extractRoleTypes(user))")
-    @Mapping(target = "")
     UserResponseDto toResponseDto(User user);
 
     default Set<SecurityRoleType> extractRoleTypes(User user){
