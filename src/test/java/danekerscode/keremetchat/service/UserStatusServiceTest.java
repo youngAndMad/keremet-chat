@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.service.impl.UserStatusServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ class UserStatusServiceTest {
     void getUserActivity_NonExistentUserActivity_ReturnsDefaultActivity() {
         var userId = 1L;
 
-        when(redisTemplate.opsForHash().get(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId)).
+        when(redisTemplate.opsForHash().get(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue(), userId)).
                 thenReturn(null);
 
         var actualUserActivity = userStatusService.getUserActivity(userId);
@@ -57,7 +57,7 @@ class UserStatusServiceTest {
 
         userStatusService.setOnlineStatus(userId);
 
-        when(this.hashOperations.get(eq(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue()), any()))
+        when(this.hashOperations.get(eq(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue()), any()))
                 .thenReturn(UserActivity
                         .defaultUserActivityForUserId(userId)
                         .withLastActive(LocalDateTime.now())
@@ -69,9 +69,9 @@ class UserStatusServiceTest {
         assertTrue(actualUserActivity.isOnline());
         assertNotNull(actualUserActivity.getLastActive());
 
-        verify(hashOperations).get(eq(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId));
-        verify(hashOperations).delete(eq(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId));
-        verify(hashOperations).put(eq(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId),any());
+        verify(hashOperations).get(eq(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId));
+        verify(hashOperations).delete(eq(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId));
+        verify(hashOperations).put(eq(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue()), eq(userId),any());
     }
 
 }

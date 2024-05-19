@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.context.runner;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
@@ -19,7 +19,7 @@ public class MinioBucketInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        var bucketName = AppConstants.MINIO_DEFAULT_BUCKET.getValue();
+        var bucketName = AppConstant.MINIO_DEFAULT_BUCKET.getValue();
 
         var bucketExists = minioClient.bucketExists(
                 BucketExistsArgs.builder()

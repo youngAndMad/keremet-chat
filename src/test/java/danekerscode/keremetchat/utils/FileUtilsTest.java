@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.utils;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -24,7 +24,7 @@ class FileUtilsTest {
 
         var fileExtension = FileUtils.getFileExtension(file);
 
-        assertEquals(fileExtension, AppConstants.EMPTY_STRING.getValue());
+        assertEquals(fileExtension, AppConstant.EMPTY_STRING.getValue());
     }
 
     @Test
@@ -32,13 +32,13 @@ class FileUtilsTest {
         var file = new MockMultipartFile("some.png", new byte[0]);
 
         var minioObjectPath = FileUtils.getMinioObjectPath(
-                AppConstants.MINIO_DEFAULT_BUCKET.getValue(),
+                AppConstant.MINIO_DEFAULT_BUCKET.getValue(),
                 file,
                 FileEntitySource.CHAT_AVATAR,
                 "1"
         );
 
-        var expectedObjectPath = AppConstants.MINIO_DEFAULT_BUCKET.getValue()
+        var expectedObjectPath = AppConstant.MINIO_DEFAULT_BUCKET.getValue()
                 .concat("/")
                 .concat(FileEntitySource.CHAT_AVATAR.getPath())
                 .concat("/")

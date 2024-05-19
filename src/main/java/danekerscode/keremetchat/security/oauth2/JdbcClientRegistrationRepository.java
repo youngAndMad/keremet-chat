@@ -51,15 +51,17 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
         this.jdbcOperations = jdbcOperations;
 
         clientRegistrationMap.forEach((provider, clientRegistrations) ->
-                clientRegistrations.forEach(c -> this.persist(c, provider))
+                clientRegistrations.forEach(clientRegistration -> this.persist(clientRegistration, provider))
         );
     }
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         Assert.hasText(registrationId, "registrationId cannot be empty");
-        var result = this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_QUERY_SQL + "registration_id = ?", clientRegistrationRowMapper, registrationId);
-        return !result.isEmpty() ? result.get(0) : null;
+        return this.jdbcOperations.query(LOAD_CLIENT_REGISTERED_QUERY_SQL + "registration_id = ?", clientRegistrationRowMapper, registrationId)
+                .stream()
+                .findFirst()
+                .orElseGet(() -> null);
     }
 
     public void delete(String registrationId) {

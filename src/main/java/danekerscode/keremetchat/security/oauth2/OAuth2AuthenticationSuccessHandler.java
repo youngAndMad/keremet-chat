@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.security.oauth2;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.AuthType;
 import danekerscode.keremetchat.repository.UserRepository;
@@ -71,9 +71,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             Authentication authentication
     ) {
         return CookieUtils
-                .getCookie(request, AppConstants.REDIRECT_URI_PARAM_COOKIE_NAME.getValue())
+                .getCookie(request, AppConstant.REDIRECT_URI_PARAM_COOKIE_NAME.getValue())
                 .map(Cookie::getValue)
-                .orElse(AppConstants.DEFAULT_SUCCESS_LOGIN_REDIRECT_URL.getValue());
+                .orElse(AppConstant.DEFAULT_SUCCESS_LOGIN_REDIRECT_URL.getValue());
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

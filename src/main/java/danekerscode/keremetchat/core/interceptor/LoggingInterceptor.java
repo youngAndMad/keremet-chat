@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.core.interceptor;
 
 import danekerscode.keremetchat.context.holder.UserContextHolder;
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.core.helper.UserContextHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,7 +24,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     public boolean preHandle(@NonNull HttpServletRequest request,
                              @NonNull HttpServletResponse response,
                              @NonNull Object handler) throws Exception {
-        request.setAttribute(AppConstants.REQUEST_START_TIME.getValue(), System.currentTimeMillis());
+        request.setAttribute(AppConstant.REQUEST_START_TIME.getValue(), System.currentTimeMillis());
         return HandlerInterceptor.super.preHandle(request, response, handler);
     }
 
@@ -36,7 +36,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     ) throws Exception {
         var currentUserName = extractCurrentUsername();
 
-        var totalExecution = System.currentTimeMillis() - (long) request.getAttribute(AppConstants.REQUEST_START_TIME.getValue());
+        var totalExecution = System.currentTimeMillis() - (long) request.getAttribute(AppConstant.REQUEST_START_TIME.getValue());
 
         log.info("Completed api request {}, method = {}, response status = {}, execution = {}ms, user={}",
                 request.getRequestURI(),

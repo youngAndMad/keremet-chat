@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.config;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.core.interceptor.LoggingInterceptor;
 import danekerscode.keremetchat.config.properties.AppProperties;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -29,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
         registry.addInterceptor(loggingInterceptor)
-                .addPathPatterns(AppConstants.LOGGING_PATH_PATTERN.getValue());
+                .addPathPatterns(AppConstant.LOGGING_PATH_PATTERN.getValue());
 
         WebMvcConfigurer.super.addInterceptors(registry);
     }

@@ -9,9 +9,8 @@ CREATE TABLE users
     email_verified     BOOLEAN,
     username           VARCHAR(255),
     password           VARCHAR(255),
-    auth_type_id       bigint not null,
+    provider       VARCHAR(255),
     email_confirmed    BOOLEAN,
-    is_active          BOOLEAN,
-    foreign key (auth_type_id) references auth_type (id)
+    is_active          BOOLEAN
 );
 --rollback DROP TABLE users;

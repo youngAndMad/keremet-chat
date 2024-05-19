@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.dto.KeyPair;
 import danekerscode.keremetchat.model.dto.response.DownloadFileResponse;
 import danekerscode.keremetchat.model.entity.FileEntity;
@@ -34,11 +34,11 @@ public class FileStorageServiceImpl implements FileStorageService {
             var inputStream = new ByteArrayInputStream(file.getBytes());
 
             var minioObjectPath = FileUtils
-                    .getMinioObjectPath(AppConstants.MINIO_DEFAULT_BUCKET.getValue(), file, source, target);
+                    .getMinioObjectPath(AppConstant.MINIO_DEFAULT_BUCKET.getValue(), file, source, target);
             minioClient.putObject(
                     PutObjectArgs.builder()
                             .stream(inputStream, inputStream.available(), -1)
-                            .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
+                            .bucket(AppConstant.MINIO_DEFAULT_BUCKET.getValue())
                             .object(minioObjectPath)
                             .build()
             );
@@ -77,7 +77,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             minioClient.removeObject(
                     io.minio.RemoveObjectArgs.builder()
-                            .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
+                            .bucket(AppConstant.MINIO_DEFAULT_BUCKET.getValue())
                             .object(file.getPath())
                             .build()
             );
@@ -119,7 +119,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             try {
                 var response = minioClient.getObject(
                         GetObjectArgs.builder()
-                                .bucket(AppConstants.MINIO_DEFAULT_BUCKET.getValue())
+                                .bucket(AppConstant.MINIO_DEFAULT_BUCKET.getValue())
                                 .object(objectPath)
                                 .build()
                 );

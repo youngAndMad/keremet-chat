@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.model.entity;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ public class Message extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String content = AppConstants.EMPTY_STRING.getValue();
+    private String content = AppConstant.EMPTY_STRING.getValue();
     private LocalDateTime sentAt;
     private boolean deleted;
     private boolean edited;

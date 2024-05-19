@@ -4,8 +4,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd"
 >
-    <include file="db/changelog/changeset/db.changelog-1.0-create-auth-type-table.sql"/>
-    <include file="db/changelog/changeset/db.changelog-1.1-create-user-table.sql"/>
+    <include file="db/changelog/changeset/db.changelog-1.0-create-user-table.sql"/>
+    <include file="db/changelog/changeset/db.changelog-1.1-create-table-verification-token.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.2-create-file-entity-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.3-create-table-chat-and-chat-member.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.4-create-security-role-table.sql"/>
@@ -13,6 +13,5 @@
     <include file="db/changelog/changeset/db.changelog-1.6-create-message-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.7-create-shedlock-table.sql"/>
     <include file="db/changelog/changeset/db.changelog-1.8-create-table-chat-notification.sql"/>
-    <include file="db/changelog/changeset/db.changelog-1.9-create-table-verification-token.sql"/>
 
 </databaseChangeLog>

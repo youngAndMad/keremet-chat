@@ -1,6 +1,6 @@
 package danekerscode.keremetchat.utils;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.enums.FileEntitySource;
 import lombok.experimental.UtilityClass;
 import org.springframework.lang.NonNull;
@@ -34,7 +34,7 @@ public class FileUtils {
     public static String getFileExtension(@NonNull MultipartFile file) {
         Assert.notNull(file, "Not null file is required");
 
-        var dotIndex = file.getName().lastIndexOf(AppConstants.DOT.getValue());
-        return dotIndex == -1 ? AppConstants.EMPTY_STRING.getValue() : file.getName().substring(dotIndex + 1);
+        var dotIndex = file.getName().lastIndexOf(AppConstant.DOT.getValue());
+        return dotIndex == -1 ? AppConstant.EMPTY_STRING.getValue() : file.getName().substring(dotIndex + 1);
     }
 }

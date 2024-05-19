@@ -1,5 +1,29 @@
 version: '3.9'
 services:
+  prometheus:
+    image: prom/prometheus:v2.37.1
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./config/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/./provisioning/dashboards:/etc/grafana/dashboards
+      - grafana-data:/var/lib/grafana
   minio:
     image: minio/minio:latest
     container_name: keremet-chat-minio
@@ -23,4 +47,7 @@ services:
       - "6379:6379"
 
 volumes:
+  grafana-data:
+    external: true
+  prom_data:
   minio_storage: {}

@@ -1,11 +1,10 @@
 package danekerscode.keremetchat.service.impl;
 
-import danekerscode.keremetchat.core.AppConstants;
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.UserActivity;
 import danekerscode.keremetchat.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class UserStatusServiceImpl implements UserStatusService {
     @Override
     public UserActivity getUserActivity(Long userId) {
         return Optional.ofNullable(
-                        this.redisTemplate.opsForHash().get(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId)
+                        this.redisTemplate.opsForHash().get(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue(), userId)
                 )
                 .map(UserActivity.class::cast)
                 .orElse(UserActivity.defaultUserActivityForUserId(userId));
@@ -60,18 +59,18 @@ public class UserStatusServiceImpl implements UserStatusService {
     @Override
     public Long getOnlineUsersCount() {
         return this.redisTemplate.opsForHash()
-                .size(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue());
+                .size(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue());
     }
 
     private void clearUserActivity(Long userId) {
         log.info("Clearing user activity for user id: {}", userId);
         this.redisTemplate.opsForHash()
-                .delete(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userId);
+                .delete(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue(), userId);
     }
 
     private void saveUserActivity(UserActivity userActivity) {
         log.info("Saving user activity: {}", userActivity);
         this.redisTemplate.opsForHash()
-                .put(AppConstants.USER_ACTIVITY_REDIS_HASH.getValue(), userActivity.getUserId(), userActivity);
+                .put(AppConstant.USER_ACTIVITY_REDIS_HASH.getValue(), userActivity.getUserId(), userActivity);
     }
 }

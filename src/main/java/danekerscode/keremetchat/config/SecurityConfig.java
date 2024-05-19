@@ -1,11 +1,13 @@
 package danekerscode.keremetchat.config;
 
+import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -39,7 +41,7 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static danekerscode.keremetchat.core.AppConstants.ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN;
+import static danekerscode.keremetchat.core.AppConstant.ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN;
 
 @Configuration
 @EnableWebSecurity
@@ -67,7 +69,7 @@ public class SecurityConfig {
 
     @Bean
     AuthenticationManager authenticationManager(
-            HttpSecurity http,
+            @NotNull HttpSecurity http,
             AuthenticationProvider daoAuthenticationProvider
     )
             throws Exception {
@@ -92,7 +94,7 @@ public class SecurityConfig {
     OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver(
             ClientRegistrationRepository clientRegistrationRepository
     ) {
-        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
+        return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, AppConstant.AUTHORIZATION_REQUEST_BASE_URL.getValue());
     }
 
 
