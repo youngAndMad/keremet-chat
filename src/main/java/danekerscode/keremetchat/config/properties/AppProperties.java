@@ -1,5 +1,6 @@
 package danekerscode.keremetchat.config.properties;
 
+import danekerscode.keremetchat.core.annotation.Password;
 import io.swagger.v3.oas.models.info.Info;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,6 +32,20 @@ public class AppProperties {
     private CorsConfig cors;
     @Valid
     private SecurityConfig security;
+    @Valid
+    private ActuatorConfig actuatorSecurity;
+
+
+    @Data
+    public static class ActuatorConfig {
+        @NotEmpty
+        private String username;
+        @NotEmpty
+        @Password
+        private String password;
+        @NotEmpty
+        private String role;
+    }
 
     @Data
     public static class OpenApiConfig {
@@ -38,7 +53,7 @@ public class AppProperties {
     }
 
     @Data
-    public static class MailConfig{
+    public static class MailConfig {
         @NotEmpty
         private String sender;
         @NotEmpty

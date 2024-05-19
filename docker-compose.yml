@@ -8,6 +8,8 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
+    profiles:
+      - monitoring
     volumes:
       - ./config/prometheus:/etc/prometheus
       - prom_data:/prometheus
@@ -17,6 +19,11 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
+    depends_on:
+      prometheus:
+        condition: service_started
+    profiles:
+      - monitoring
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana

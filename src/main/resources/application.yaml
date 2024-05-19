@@ -78,6 +78,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/keremet_chat
 
 app:
+  actuator-security:
+    password: keremetchat123
+    username: danekerscode
+    role: ACTUATOR
   cors:
     allowCredentials: true
     allowedOrigins: http://localhost:5173/,http://localhost:4200/

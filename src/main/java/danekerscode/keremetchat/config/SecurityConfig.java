@@ -1,7 +1,7 @@
 package danekerscode.keremetchat.config;
 
+import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.core.AppConstant;
-import danekerscode.keremetchat.security.CustomUserDetailsService;
 import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -20,17 +21,22 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -70,11 +76,11 @@ public class SecurityConfig {
     @Bean
     AuthenticationManager authenticationManager(
             @NotNull HttpSecurity http,
-            AuthenticationProvider daoAuthenticationProvider
+            UserDetailsService customUserDetailsService
     )
             throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationProvider(daoAuthenticationProvider)
+                .authenticationProvider(createAuthenticationManagerForUserDetailsService(customUserDetailsService))
                 .build();
     }
 
@@ -99,12 +105,14 @@ public class SecurityConfig {
 
 
     @Bean
+    @Order(2)
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
             HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
-            OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver
+            OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver,
+            AuthenticationManager authenticationManager
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -123,8 +131,8 @@ public class SecurityConfig {
                                         .permitAll()
                                         .authorizationEndpoint(
                                                 authEndpoint -> authEndpoint
-//                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver)
                                                         .authorizationRequestRepository(authorizationRequestRepository)
+//                                                .authorizationRequestResolver(oAuth2AuthorizationRequestResolver) // todo fix problem with ant matcher
                                         )
                 )
                 /*
@@ -137,6 +145,7 @@ public class SecurityConfig {
                  * Fire a LogoutSuccessEvent (LogoutSuccessEventPublishingLogoutHandler)
                  * Once completed, then it will exercise its default LogoutSuccessHandler which redirects to /login?logout.
                  */
+                .authenticationManager(authenticationManager)
                 .logout(logoutSettings -> logoutSettings
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                         .logoutUrl("/api/v1/auth/logout")
@@ -147,13 +156,51 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationProvider daoAuthenticationProvider(
-            CustomUserDetailsService userDetailsService,
+    UserDetailsService inMemoryActuatorUserDetailsService(
+            AppProperties appProperties,
             PasswordEncoder passwordEncoder
+    ) {
+        var actuatorSecurity = appProperties.getActuatorSecurity();
+        var user = User.withUsername(actuatorSecurity.getUsername())
+                .password(passwordEncoder.encode(actuatorSecurity.getPassword()))
+                .roles(actuatorSecurity.getRole())
+                .build();
+        return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    @Order(1)
+    SecurityFilterChain actuatorFilterChain(
+            HttpSecurity http,
+            UserDetailsService inMemoryActuatorUserDetailsService,
+            AppProperties appProperties
+    ) throws Exception {
+        var authenticationManager = http
+                .getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(createAuthenticationManagerForUserDetailsService(inMemoryActuatorUserDetailsService)).build();
+
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .userDetailsService(inMemoryActuatorUserDetailsService)
+                .securityMatcher(request -> request.getRequestURI().startsWith("/actuator"))
+                .authenticationManager(authenticationManager)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().hasRole(appProperties.getActuatorSecurity().getRole())
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+
+        return http.build();
+    }
+
+    private AuthenticationProvider createAuthenticationManagerForUserDetailsService(
+            UserDetailsService userDetailsService
     ) {
         var authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setHideUserNotFoundExceptions(false);
         return authenticationProvider;
     }
