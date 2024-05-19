@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class JdbcMessageRepository implements MessageRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final JdbcClient jdbcClient;
+    private final JdbcClient jdbcClient; // todo use jdbc client instead jdbc template
     private final SimpleJdbcInsert jdbcInsert;
 
     public JdbcMessageRepository(JdbcTemplate jdbcTemplate, JdbcClient jdbcClient) {

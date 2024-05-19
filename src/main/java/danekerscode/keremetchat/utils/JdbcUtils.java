@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.springframework.jdbc.core.SqlParameterValue;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.util.StringUtils;
 
@@ -84,6 +86,33 @@ public class JdbcUtils {
                 .userInfoAuthenticationMethod(Oauth2Utils.resolveUserInfoAuthenticationMethod(rs.getString("user_info_authentication_method")))
                 .userNameAttributeName(rs.getString("user_name_attribute_name"))
                 .build();
+    }
+
+    public static JdbcClient.StatementSpec enrichJdbcStatementForClientRegistration(
+            JdbcClient.StatementSpec st,
+            ClientRegistration clientRegistration,
+            CommonOAuth2Provider provider
+    ) {
+        st
+                .param("registrationId", clientRegistration.getRegistrationId())
+                .param("clientId", clientRegistration.getClientId())
+                .param("clientSecret", clientRegistration.getClientSecret())
+                .param("clientAuthenticationMethod", clientRegistration.getClientAuthenticationMethod().getValue())
+                .param("authorizationGrantType", clientRegistration.getAuthorizationGrantType().getValue())
+                .param("clientName", clientRegistration.getClientName())
+                .param("redirectUri", clientRegistration.getRedirectUri())
+                .param("scopes", StringUtils.collectionToCommaDelimitedString(clientRegistration.getScopes()))
+                .param("authorizationUri", clientRegistration.getProviderDetails().getAuthorizationUri())
+                .param("tokenUri", clientRegistration.getProviderDetails().getTokenUri())
+                .param("jwkSetUri", clientRegistration.getProviderDetails().getJwkSetUri())
+                .param("issuerUri", clientRegistration.getProviderDetails().getIssuerUri())
+                .param("userInfoUri", clientRegistration.getProviderDetails().getUserInfoEndpoint().getUri())
+                .param("userInfoAuthenticationMethod", clientRegistration.getProviderDetails().getUserInfoEndpoint().getAuthenticationMethod().getValue())
+                .param("userNameAttributeName", clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName())
+                .param("configurationMetadata", ObjectMapperUtils.writeMap(clientRegistration.getProviderDetails().getConfigurationMetadata()))
+                .param("providerName", provider.name());
+
+        return st;
     }
 
     private static String toSnakeCase(String str) {

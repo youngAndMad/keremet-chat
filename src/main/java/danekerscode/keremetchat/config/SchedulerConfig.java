@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
-public class SchedulerConfiguration {
+public class SchedulerConfig {
 
     /**
      * Method which will create bean to control  locking of scheduled tasks

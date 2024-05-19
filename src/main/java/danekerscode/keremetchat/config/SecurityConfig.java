@@ -2,9 +2,10 @@ package danekerscode.keremetchat.config;
 
 import danekerscode.keremetchat.config.properties.AppProperties;
 import danekerscode.keremetchat.core.AppConstant;
+import danekerscode.keremetchat.repository.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.repository.impl.JdbcClientRegistrationRepositoryImpl;
 import danekerscode.keremetchat.security.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -86,14 +87,14 @@ public class SecurityConfig {
 
     @Bean
     JdbcClientRegistrationRepository clientRegistrationRepository(
-            JdbcOperations jdbcOperations,
-            OAuth2ClientProperties oAuth2ClientProperties
+            OAuth2ClientProperties oAuth2ClientProperties,
+            JdbcClient jdbcClient
     ) {
         var propertiesMapper = new OAuth2ClientPropertiesMapper(oAuth2ClientProperties);
         var clientRegistrations = propertiesMapper.asClientRegistrations().values();
         var clientRegistrationMap = clientRegistrations.stream()
                 .collect(Collectors.groupingBy(c -> this.getProviderNameByRegistrationId(c.getRegistrationId())));
-        return new JdbcClientRegistrationRepository(jdbcOperations, clientRegistrationMap);
+        return new JdbcClientRegistrationRepositoryImpl(jdbcClient, clientRegistrationMap);
     }
 
     @Bean
@@ -182,7 +183,6 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .userDetailsService(inMemoryActuatorUserDetailsService)
                 .securityMatcher(request -> request.getRequestURI().startsWith("/actuator"))
                 .authenticationManager(authenticationManager)
                 .authorizeHttpRequests(auth -> auth

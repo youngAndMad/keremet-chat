@@ -3,6 +3,7 @@ package danekerscode.keremetchat.security.oauth2;
 import danekerscode.keremetchat.core.AppConstant;
 import danekerscode.keremetchat.model.entity.User;
 import danekerscode.keremetchat.model.enums.AuthType;
+import danekerscode.keremetchat.repository.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.repository.UserRepository;
 import danekerscode.keremetchat.utils.CookieUtils;
 import jakarta.servlet.http.Cookie;
@@ -45,7 +46,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             var username = principal.getName();
 
             var provider = AuthType.fromCommonOauth2Provider(
-                    clientRegistrationRepository.getProviderName(auth2AuthenticationToken.getAuthorizedClientRegistrationId())
+                    clientRegistrationRepository.getProviderNameForClientRegistration(auth2AuthenticationToken.getAuthorizedClientRegistrationId())
             );
             if (!userRepository.existsByUsernameAndProvider(username, provider)) {
                 var user = new User();

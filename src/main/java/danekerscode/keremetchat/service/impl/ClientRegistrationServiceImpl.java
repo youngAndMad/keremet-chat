@@ -3,7 +3,7 @@ package danekerscode.keremetchat.service.impl;
 import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
 import danekerscode.keremetchat.model.exception.EntityNotFoundException;
-import danekerscode.keremetchat.security.oauth2.JdbcClientRegistrationRepository;
+import danekerscode.keremetchat.repository.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +28,12 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
                 .clientSecret(clientRegistrationRequest.clientSecret())
                 .build();
 
-      clientRegistrationRepository.insertClientRegistration(clientRegistration, clientRegistrationRequest.provider());
+      clientRegistrationRepository.save(clientRegistration, clientRegistrationRequest.provider());
     }
 
     @Override
     public void delete(String registrationId) {
-        clientRegistrationRepository.delete(registrationId);
+        clientRegistrationRepository.deleteByRegistrationId(registrationId);
     }
 
     @Override
@@ -49,7 +49,8 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
             throw new EntityNotFoundException(ClientRegistration.class, clientRegistrationRequest.registrationId());
         }
 
-        clientRegistrationRepository.updateRegisteredClient(clientRegistration);
+        clientRegistrationRepository.deleteByRegistrationId(clientRegistration.getRegistrationId());
+        clientRegistrationRepository.save(clientRegistration,clientRegistrationRequest.provider());
     }
 
     @Override

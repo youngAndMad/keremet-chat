@@ -63,7 +63,7 @@ public class ClientRegistrationController {
     }
 
     @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
-    @GetMapping("admin")
+    @GetMapping("full")
     @Operation(summary = "Get all client registrations for admin")
     Collection<ClientRegistration> findAllForAdmin(){
         return clientRegistrationService.findAllForAdmin();
