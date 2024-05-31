@@ -7,11 +7,15 @@ import danekerscode.keremetchat.repository.JdbcClientRegistrationRepository;
 import danekerscode.keremetchat.service.ClientRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +32,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
                 .clientSecret(clientRegistrationRequest.clientSecret())
                 .build();
 
-      clientRegistrationRepository.save(clientRegistration, clientRegistrationRequest.provider());
+        clientRegistrationRepository.save(clientRegistration, clientRegistrationRequest.provider());
     }
 
     @Override
@@ -50,7 +54,7 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
         }
 
         clientRegistrationRepository.deleteByRegistrationId(clientRegistration.getRegistrationId());
-        clientRegistrationRepository.save(clientRegistration,clientRegistrationRequest.provider());
+        clientRegistrationRepository.save(clientRegistration, clientRegistrationRequest.provider());
     }
 
     @Override
@@ -59,7 +63,9 @@ public class ClientRegistrationServiceImpl implements ClientRegistrationService 
     }
 
     @Override
-    public Collection<ClientRegistration> findAllForAdmin() {
-        return this.clientRegistrationRepository.findAll();
+    public Map<CommonOAuth2Provider, List<ClientRegistration>> findAllForAdmin() {
+        return this.clientRegistrationRepository.findAll()
+                .stream()
+                .collect(Collectors.groupingBy(cr -> this.clientRegistrationRepository.getProviderNameForClientRegistration(cr.getRegistrationId())));
     }
 }

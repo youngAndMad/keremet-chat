@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
                     var verificationTokenValue = randomString.get();
 
                     var sendMailArgs = SendMailArgs.builder()
-                            .type(MailMessageType.GREETING)
+                            .type(MailMessageType.MAIL_CONFIRMATION)
                             .properties(Map.of(
                                     "link", appProperties.getMail().getVerificationLinkPattern().formatted(verificationTokenValue),
                                     "receiverEmail", user.getEmail(),
@@ -113,13 +113,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserResponseDto getCurrentUser() {
-        var currentUserExists = UserContextHolder.isExists();
+        var currentUserExists = UserContextHolder.isPresent();
 
         if (!currentUserExists) {
             throw new AuthProcessingException("Current user does not exists in context holder", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        var currentUser = UserContextHolder.getContext();
+        var currentUser = UserContextHolder.get();
 
         return userMapper.toResponseDto(currentUser);
     }
@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        var currentUser = UserContextHolder.getContext();
+        var currentUser = UserContextHolder.get();
 
         if (!passwordEncoder.matches(resetPasswordRequest.oldPassword(), currentUser.getPassword())) {
             throw new AuthProcessingException("Old password is incorrect", HttpStatus.BAD_REQUEST);

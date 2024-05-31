@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AppConstant {
-
     USER_NOTIFICATION_REDIS_SET_PREFIX("user_notification:"),
 
     ENV_COMMON_OAUTH2_PROVIDER_PLACEHOLDER_PATTERN("spring.security.oauth2.client.registration.%s.common-provider-type"),
@@ -24,7 +23,7 @@ public enum AppConstant {
     DEFAULT_SUCCESS_LOGIN_REDIRECT_URL("/api/v1/auth/me"),
 
     MANUAL_AUTH_TYPE("MANUAL"),
-    AUTHORIZATION_REQUEST_BASE_URL("/oauth2/authorization"),
+    AUTHORIZATION_REQUEST_BASE_URL("/oauth2/authorization/"),
     OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME("oauth2_auth_request"),
     REDIRECT_URI_PARAM_COOKIE_NAME("redirect_uri"),
 

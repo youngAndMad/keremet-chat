@@ -8,11 +8,11 @@ public class UserContextHolder {
 
     private final static ThreadLocal<User> userContext = new ThreadLocal<>();
 
-    public static void setContext(User context) {
+    public static void set(User context) {
         userContext.set(context);
     }
 
-    public static User getContext() {
+    public static User get() {
         return userContext.get();
     }
 
@@ -24,7 +24,7 @@ public class UserContextHolder {
         return userContext.get() == null;
     }
 
-    public static boolean isExists(){
+    public static boolean isPresent(){
         return !isEmpty();
     }
 }

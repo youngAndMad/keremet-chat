@@ -2,10 +2,12 @@ package danekerscode.keremetchat.service;
 
 import danekerscode.keremetchat.model.dto.request.ClientRegistrationRequest;
 import danekerscode.keremetchat.model.dto.response.ClientRegistrationResponse;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public interface ClientRegistrationService {
 
@@ -19,5 +21,5 @@ public interface ClientRegistrationService {
 
     ClientRegistration findByRegistrationId(String registrationId);
 
-    Collection<ClientRegistration> findAllForAdmin();
+    Map<CommonOAuth2Provider, List<ClientRegistration>> findAllForAdmin();
 }

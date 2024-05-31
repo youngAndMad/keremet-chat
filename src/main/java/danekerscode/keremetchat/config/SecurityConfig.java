@@ -9,6 +9,7 @@ import danekerscode.keremetchat.security.oauth2.HttpCookieOAuth2AuthorizationReq
 import danekerscode.keremetchat.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientPropertiesMapper;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -60,6 +61,7 @@ import static danekerscode.keremetchat.core.AppConstant.ENV_COMMON_OAUTH2_PROVID
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    public static final HttpStatusEntryPoint AUTHENTICATION_ENTRY_POINT = new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
     private final Environment env;
 
     private static final String[] publicEndpoints = {
@@ -104,16 +106,15 @@ public class SecurityConfig {
         return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, AppConstant.AUTHORIZATION_REQUEST_BASE_URL.getValue());
     }
 
-
     @Bean
-    @Order(2)
+    @Order(3)
     SecurityFilterChain oauth2FilterChain(
             HttpSecurity http,
             OidcUserService customOidcUserService,
             OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
             HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
             OAuth2AuthorizationRequestResolver oAuth2AuthorizationRequestResolver,
-            AuthenticationManager authenticationManager
+            @Qualifier("authenticationManager") AuthenticationManager authenticationManager
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -157,14 +158,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService inMemoryActuatorUserDetailsService(
+    UserDetailsService basicInMemoryUserDetailsService(
             AppProperties appProperties,
             PasswordEncoder passwordEncoder
     ) {
-        var actuatorSecurity = appProperties.getActuatorSecurity();
-        var user = User.withUsername(actuatorSecurity.getUsername())
-                .password(passwordEncoder.encode(actuatorSecurity.getPassword()))
-                .roles(actuatorSecurity.getRole())
+        var basicAuth = appProperties.getSecurity().getBasicAuth();
+        var user = User.withUsername(basicAuth.getUsername())
+                .password(passwordEncoder.encode(basicAuth.getPassword()))
+                .roles(basicAuth.getRole())
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
@@ -173,12 +174,12 @@ public class SecurityConfig {
     @Order(1)
     SecurityFilterChain actuatorFilterChain(
             HttpSecurity http,
-            UserDetailsService inMemoryActuatorUserDetailsService,
+            UserDetailsService basicInMemoryUserDetailsService,
             AppProperties appProperties
     ) throws Exception {
         var authenticationManager = http
                 .getSharedObject(AuthenticationManagerBuilder.class)
-                .authenticationProvider(createAuthenticationManagerForUserDetailsService(inMemoryActuatorUserDetailsService)).build();
+                .authenticationProvider(createAuthenticationManagerForUserDetailsService(basicInMemoryUserDetailsService)).build();
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -186,11 +187,41 @@ public class SecurityConfig {
                 .securityMatcher(request -> request.getRequestURI().startsWith("/actuator"))
                 .authenticationManager(authenticationManager)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasRole(appProperties.getActuatorSecurity().getRole())
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .anyRequest().hasRole(appProperties.getSecurity().getBasicAuth().getRole())
                 )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+                .exceptionHandling(e -> e.authenticationEntryPoint(AUTHENTICATION_ENTRY_POINT));
+
+        return http.build();
+    }
+
+//    @Bean
+//    @Order(2)
+    SecurityFilterChain swaggerFilterChain(
+            HttpSecurity http,
+            UserDetailsService basicInMemoryUserDetailsService,
+            AppProperties appProperties
+    ) throws Exception {
+        var authenticationManager = http
+                .getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(createAuthenticationManagerForUserDetailsService(basicInMemoryUserDetailsService)).build();
+
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
+                .securityMatcher(request -> request.getRequestURI().startsWith("/swagger"))
+                .authenticationManager(authenticationManager)
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().hasRole(appProperties.getSecurity().getBasicAuth().getRole())
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(e -> e.authenticationEntryPoint(AUTHENTICATION_ENTRY_POINT));
 
         return http.build();
     }

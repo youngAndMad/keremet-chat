@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,7 +67,7 @@ public class ClientRegistrationController {
     @PreAuthorize("hasRole('ROLE_APPLICATION_ROOT_ADMIN')")
     @GetMapping("full")
     @Operation(summary = "Get all client registrations for admin")
-    Collection<ClientRegistration> findAllForAdmin(){
+    Map<CommonOAuth2Provider, List<ClientRegistration>> findAllForAdmin() {
         return clientRegistrationService.findAllForAdmin();
     }
 

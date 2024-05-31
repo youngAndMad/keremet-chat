@@ -46,14 +46,14 @@ public class JdbcClientRegistrationRepositoryImpl implements JdbcClientRegistrat
         return jdbcClient.sql("select * from oauth2_client_registration")
                 .query(CLIENT_REGISTRATION_MAPPER)
                 .stream()
-                .map(c -> new ClientRegistrationResponse(this.getProviderNameForClientRegistration(c.getRegistrationId()), c.getRegistrationId()))
+                .map(c -> new ClientRegistrationResponse(c.getRegistrationId(), this.getProviderNameForClientRegistration(c.getRegistrationId())))
                 .iterator();
     }
 
     @Override
     public ClientRegistration findByRegistrationId(String registrationId) {
         Assert.hasText(registrationId, "RegistrationId cannot be empty");
-        return jdbcClient.sql("select * oauth2_client_registration where registration_id = :registrationId")
+        return jdbcClient.sql("select * from oauth2_client_registration where registration_id = :registrationId")
                 .param("registrationId", registrationId)
                 .query(CLIENT_REGISTRATION_MAPPER)
                 .optional()

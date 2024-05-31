@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.util.UrlUtils;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -33,7 +32,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 
-    private final AntPathRequestMatcher authorizationRequestMatcher;
+    private final String authorizationRequestBaseUri;
     private final ClientRegistrationRepository clientRegistrationRepository;
     private static final StringKeyGenerator DEFAULT_STATE_GENERATOR = new Base64StringKeyGenerator(Base64.getUrlEncoder());
     private static final StringKeyGenerator DEFAULT_SECURE_KEY_GENERATOR = new Base64StringKeyGenerator(Base64.getUrlEncoder().withoutPadding(), 96);
@@ -46,15 +45,15 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         Assert.notNull(clientRegistrationRepository, "clientRegistrationRepository cannot be null");
         Assert.hasText(authorizationRequestBaseUri, "authorizationRequestBaseUri cannot be empty");
 
+        this.authorizationRequestBaseUri = authorizationRequestBaseUri;
         this.clientRegistrationRepository = clientRegistrationRepository;
-        this.authorizationRequestMatcher = new AntPathRequestMatcher(authorizationRequestBaseUri + "/{registrationId}");
     }
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
         String registrationId = this.resolveRegistrationId(request);
         if (registrationId == null) {
-            throw new Oauth2ProcessingException("Invalid registrationId id in request");
+            return null;
         } else {
             String redirectUriAction = this.getAction(request, "login");
             return this.resolve(request, registrationId, redirectUriAction);
@@ -114,9 +113,10 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     }
 
     private String resolveRegistrationId(HttpServletRequest request) {
-        return this.authorizationRequestMatcher.matches(request) ?
-                this.authorizationRequestMatcher.matcher(request).getVariables().get("registrationId")
-                : null;
+        if (!request.getRequestURI().startsWith(authorizationRequestBaseUri)) {
+            return null;
+        }
+        return request.getRequestURI().substring(authorizationRequestBaseUri.length());
     }
 
     private static String expandRedirectUri(

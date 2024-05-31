@@ -32,20 +32,6 @@ public class AppProperties {
     private CorsConfig cors;
     @Valid
     private SecurityConfig security;
-    @Valid
-    private ActuatorConfig actuatorSecurity;
-
-
-    @Data
-    public static class ActuatorConfig {
-        @NotEmpty
-        private String username;
-        @NotEmpty
-        @Password
-        private String password;
-        @NotEmpty
-        private String role;
-    }
 
     @Data
     public static class OpenApiConfig {
@@ -89,11 +75,24 @@ public class AppProperties {
     public static class SecurityConfig {
         @Valid
         private Admin defaultAdmin;
+        @Valid
+        private BasicAuthConfig basicAuth;
+
+        @Data
+        public static class BasicAuthConfig {
+            @NotEmpty
+            private String username;
+            @Password
+            private String password;
+            @NotEmpty
+            private String role;
+        }
 
         @Data
         public static class Admin {
             @NotEmpty
             private String email;
+            @Password
             @NotEmpty
             private String password;
         }

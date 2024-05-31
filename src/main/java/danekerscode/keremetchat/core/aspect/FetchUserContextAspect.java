@@ -39,7 +39,7 @@ public class FetchUserContextAspect {
 
         var user = userContextHelper.extractUser(currentAuth);
 
-        UserContextHolder.setContext(user);
+        UserContextHolder.set(user);
 
         if (Boolean.TRUE.equals(fetchUserContext.checkPersonalAccess())) {
             var accessCheck = fetchUserContext.accessCheck();

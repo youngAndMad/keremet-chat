@@ -49,7 +49,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
     }
 
     private String extractCurrentUsername() {
-        var currentUser = UserContextHolder.getContext();
+        var currentUser = UserContextHolder.get();
 
         var currentUserName = currentUser == null ? null :
                 currentUser.getEmail() == null ? currentUser.getUsername() :

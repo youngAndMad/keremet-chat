@@ -25,14 +25,14 @@ public class ChatSettingsController {
             @RequestBody @Validated ChatSettingsDto chatSettingsDto,
             @PathVariable Long chatId
     ) {
-        chatSettingsService.updateSettingsFor(chatId, chatSettingsDto, UserContextHolder.getContext());
+        chatSettingsService.updateSettingsFor(chatId, chatSettingsDto, UserContextHolder.get());
     }
 
     @Operation(description = "Reset chat settings to default")
     @FetchUserContext
     @PutMapping("default/{chatId}")
     void resetToDefault(@PathVariable Long chatId) {
-        chatSettingsService.setDefaultForChat(chatId, UserContextHolder.getContext());
+        chatSettingsService.setDefaultForChat(chatId, UserContextHolder.get());
     }
 
 

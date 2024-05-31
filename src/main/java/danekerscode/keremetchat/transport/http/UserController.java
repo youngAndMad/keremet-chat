@@ -36,14 +36,14 @@ public class UserController {
     @DeleteMapping("{userId}")
     @FetchUserContext(checkPersonalAccess = true)
     void deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId, UserContextHolder.getContext());
+        userService.deleteUser(userId, UserContextHolder.get());
     }
 
     @Operation(summary = "Deactivate user by id")
     @FetchUserContext(checkPersonalAccess = true)
     @PatchMapping("{userId}/deactivate")
     void deactivateUser(@PathVariable Long userId) {
-        userService.deactivateUser(userId, UserContextHolder.getContext());
+        userService.deactivateUser(userId, UserContextHolder.get());
     }
 
     @GetMapping

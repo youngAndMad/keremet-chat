@@ -30,7 +30,7 @@ public class ChatController {
     IdDto<Long> createPrivateChat(
             @RequestBody @Validated CreatePrivateChatRequest createChatRequest
     ) {
-        return chatService.createPrivateChat(createChatRequest, UserContextHolder.getContext());
+        return chatService.createPrivateChat(createChatRequest, UserContextHolder.get());
     }
 
     @PostMapping
@@ -40,7 +40,7 @@ public class ChatController {
     IdDto<Long> createChat(
             @ModelAttribute @Validated CreateGroupChatRequest createGroupChatRequest
     ) {
-        return chatService.createGroupChat(createGroupChatRequest, UserContextHolder.getContext());
+        return chatService.createGroupChat(createGroupChatRequest, UserContextHolder.get());
     }
 
     @DeleteMapping("{chatId}")
@@ -52,7 +52,7 @@ public class ChatController {
     void deleteChat(
             @PathVariable Long chatId
     ) {
-        chatService.deleteChat(chatId, UserContextHolder.getContext());
+        chatService.deleteChat(chatId, UserContextHolder.get());
     }
 
     @PostMapping("{id}/avatar")
@@ -81,7 +81,7 @@ public class ChatController {
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
-        chatService.processUserInvitation(userId, id, UserContextHolder.getContext());
+        chatService.processUserInvitation(userId, id, UserContextHolder.get());
     }
 
     @FetchUserContext
@@ -91,6 +91,6 @@ public class ChatController {
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
-        chatService.deleteChatMember(userId, id, UserContextHolder.getContext());
+        chatService.deleteChatMember(userId, id, UserContextHolder.get());
     }
 }

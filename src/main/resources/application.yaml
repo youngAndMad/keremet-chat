@@ -79,10 +79,6 @@ spring:
     url: jdbc:postgresql://localhost:5432/keremet_chat
 
 app:
-  actuator-security:
-    password: keremetchat123
-    username: danekerscode
-    role: ACTUATOR
   cors:
     allowCredentials: true
     allowedOrigins: http://localhost:5173/,http://localhost:4200/
@@ -104,6 +100,10 @@ app:
     sender: no-reply@keremet-chat.com
     verification-link-pattern: 'http://localhost:5173/auth/email/confirm?token=%s' # todo create react component to handle it
   security:
+    basic-auth:
+      password: keremetchat123
+      username: danekerscode
+      role: KEREMET_CHAT
     delete-inactive-users: false
     delete-inactive-users-cron: '0 0 0 * * *' # every day at midnight
     default-admin:
